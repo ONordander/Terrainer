@@ -232,7 +232,7 @@ edan35::Terrainer::run()
         }
 
         glCullFace(GL_BACK);
-        glDepthFunc(GL_ALWAYS);
+        //glDepthFunc(GL_ALWAYS);
 	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
