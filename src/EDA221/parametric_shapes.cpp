@@ -13,21 +13,21 @@
 eda221::mesh_data
 parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned int res_width, unsigned int res_height)
 {
+	printf("res_radius: %d, res_theta: %d, inner_radius: %d, outer_radius: %d\n", res_width, res_height, width, height);
 	auto vertices = std::vector<glm::uvec3>(res_width * res_height);
-	auto indices = std::vector<glm::uvec3>(res_width * res_height);
-	//auto indices = std::vector<glm::uvec3>(2 * (res_width - 1) * (res_height - 1));
-	unsigned int index = 0u;
+	auto indices = std::vector<glm::uvec3>(2 * (res_width - 1) * (res_height - 1));
+	size_t index = 0u;
 
 	for (unsigned int x = 0u; x < res_width; x++) {
 		for (unsigned int y = 0u; y < res_height; y++) {
-			vertices[index] = glm::uvec3(static_cast<float>(x) * static_cast<float>(height) / static_cast<float>(res_height),
-										static_cast<float>(y) * static_cast<float>(width) / static_cast<float>(res_width),
+			vertices[index] = glm::uvec3(static_cast<float>(x) * static_cast<float>(width) / static_cast<float>(res_width),
+										static_cast<float>(y) * static_cast<float>(height) / static_cast<float>(res_height),
 										0.0f);
 			++index;
 		}
 	}
 
-	index = 0;
+	index = 0u;
 	for (unsigned int x = 0u; x < res_width - 1; x++) {
 		for (unsigned int y = 0u; y < res_height - 1; y++) {
 			indices[index] = glm::uvec3(x + res_width * y, x + 1 + res_width * y, x + 1 + res_width * (y + 1));

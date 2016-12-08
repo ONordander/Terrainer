@@ -102,12 +102,15 @@ edan35::Terrainer::run()
                        static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
                        1.0f, 10000.0f);
     mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 100.0f, 180.0f));
-    mCamera.mWorld.LookAt(glm::vec3(0.0f, 0.0f, 0.0f));
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
 
-    eda221::mesh_data quad = parametric_shapes::createQuad(100, 100, 100, 100);
+    eda221::mesh_data quad = parametric_shapes::createCircleRing(100, 100, 100, 100);
+    if (quad.vao == 0u) {
+        LogError("Failed to load quad shape");
+        return;
+    }
 
     //
     // Load all the shader programs used
@@ -117,7 +120,7 @@ edan35::Terrainer::run()
         LogError("Failed to load fallback shader");
         return;
     }
-
+    /*
     auto const reload_shader = [fallback_shader](std::string const& vertex_path, std::string const& fragment_path, GLuint& program){
         if (program != 0u && program != fallback_shader)
             glDeleteProgram(program);
@@ -137,71 +140,23 @@ edan35::Terrainer::run()
         reload_shader("resolve_deferred.vert",  "resolve_deferred.frag",  resolve_deferred_shader);
     };
     reload_shaders();
-
-    auto const set_uniforms = [](GLuint /*program*/){};
+    */
+    auto const light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
+    auto const set_uniforms = [&light_position](GLuint program){
+        glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+    };
 
     auto quad_node = Node();
     quad_node.set_geometry(quad);
     quad_node.set_program(fallback_shader, set_uniforms);
 
-    //
-    // Setup textures
-    //
-    auto const diffuse_texture                     = eda221::createTexture(window_size.x, window_size.y);
-    auto const specular_texture                    = eda221::createTexture(window_size.x, window_size.y);
-    auto const normal_texture                      = eda221::createTexture(window_size.x, window_size.y);
-    auto const light_diffuse_contribution_texture  = eda221::createTexture(window_size.x, window_size.y);
-    auto const light_specular_contribution_texture = eda221::createTexture(window_size.x, window_size.y);
-    auto const depth_texture                       = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
-    auto const shadowmap_texture                   = eda221::createTexture(constant::shadowmap_res_x, constant::shadowmap_res_y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
-
-
-    //
-    // Setup FBOs
-    //
-    auto const deferred_fbo  = eda221::createFBO({diffuse_texture, specular_texture, normal_texture}, depth_texture);
-    auto const shadowmap_fbo = eda221::createFBO({}, shadowmap_texture);
-    auto const light_fbo     = eda221::createFBO({light_diffuse_contribution_texture, light_specular_contribution_texture}, depth_texture);
-
-    //
-    // Setup samplers
-    //
-    auto const default_sampler = eda221::createSampler([](GLuint sampler){
-        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    });
-
-    auto const depth_sampler = eda221::createSampler([](GLuint sampler){
-        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    });
-
-    auto const shadow_sampler = eda221::createSampler([](GLuint sampler){
-        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-        GLfloat border_color[4] = { 1.0f, 0.0f, 0.0f, 0.0f};
-        glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, border_color);
-    });
-
-    auto const bind_texture_with_sampler = [](GLenum target, unsigned int slot, GLuint program, std::string const& name, GLuint texture, GLuint sampler){
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(target, texture);
-        glUniform1i(glGetUniformLocation(program, name.c_str()), static_cast<GLint>(slot));
-        glBindSampler(slot, sampler);
-    };
+    quad_node.scale(glm::vec3(8.0f, 8.0f, 8.0f));
 
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     double ddeltatime;
     size_t fpsSamples = 0;
@@ -225,16 +180,18 @@ edan35::Terrainer::run()
         ImGui_ImplGlfwGL3_NewFrame();
 
         if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
-            reload_shaders();
+            //reload_shaders();
         }
 
-        glCullFace(GL_FRONT);
-        glDepthFunc(GL_ALWAYS);
-	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
+        glViewport(0, 0, window_size.x, window_size.y);
+        glClearDepthf(1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	    quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
         Log::View::Render();
-
 
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
         if (opened)
@@ -247,14 +204,6 @@ edan35::Terrainer::run()
         lastTime = nowTime;
     }
 
-    glDeleteProgram(resolve_deferred_shader);
-    resolve_deferred_shader = 0u;
-    glDeleteProgram(accumulate_lights_shader);
-    accumulate_lights_shader = 0u;
-    glDeleteProgram(fill_shadowmap_shader);
-    fill_shadowmap_shader = 0u;
-    glDeleteProgram(fill_gbuffer_shader);
-    fill_gbuffer_shader = 0u;
     glDeleteProgram(fallback_shader);
     fallback_shader = 0u;
 }
