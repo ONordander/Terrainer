@@ -30,18 +30,18 @@ set (
 )
 
 set (
-	ASSIGNMENT2_SOURCES
+	TERRAINER_SOURCES
 
-	"assignment2.cpp"
-	"assignment2.hpp"
+	"terrainer.cpp"
+	"terrainer.hpp"
 )
 
 source_group (
 	EDA221${PATH_SEP}Assignment2
 
 	FILES
-	${PROJECT_SOURCE_DIR}/assignment2.cpp
-	${PROJECT_SOURCE_DIR}/assignment2.hpp
+	${PROJECT_SOURCE_DIR}/terrainer.cpp
+	${PROJECT_SOURCE_DIR}/terrainer.hpp
 )
 
-luggcgl_new_assignment ("EDAN35_Assignment2" "${ASSIGNMENT2_SOURCES}" "${COMMON_SOURCES}")
+luggcgl_new_assignment ("EDAN35_TERRAINER" "${TERRAINER_SOURCES}" "${COMMON_SOURCES}")
