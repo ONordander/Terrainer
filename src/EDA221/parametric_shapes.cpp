@@ -15,6 +15,7 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned 
 {
 	auto vertices = std::vector<glm::uvec3>(res_width * res_height);
 	auto indices = std::vector<glm::uvec3>(res_width * res_height);
+	//auto indices = std::vector<glm::uvec3>(2 * (res_width - 1) * (res_height - 1));
 	unsigned int index = 0u;
 
 	for (unsigned int x = 0u; x < res_width; x++) {
@@ -22,9 +23,10 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned 
 			vertices[index] = glm::uvec3(static_cast<float>(x) * static_cast<float>(height) / static_cast<float>(res_height),
 										static_cast<float>(y) * static_cast<float>(width) / static_cast<float>(res_width),
 										0.0f);
-			index++;
+			++index;
 		}
 	}
+
 	index = 0;
 	for (unsigned int x = 0u; x < res_width - 1; x++) {
 		for (unsigned int y = 0u; y < res_height - 1; y++) {
