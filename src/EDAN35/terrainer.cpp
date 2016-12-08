@@ -58,7 +58,7 @@ edan35::Terrainer::Terrainer()
 {
     Log::View::Init();
 
-    window = Window::Create("EDAN35: Assignment 2", config::resolution_x,
+    window = Window::Create("Terrainer", config::resolution_x,
                             config::resolution_y, config::msaa_rate, false, false);
     if (window == nullptr) {
         Log::View::Destroy();
