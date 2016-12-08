@@ -13,8 +13,8 @@
 eda221::mesh_data
 parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned int res_width, unsigned int res_height)
 {
-	auto vertices = std::vector<glm::uvec3>();
-	auto indices = std::vector<glm::uvec3>();
+	auto vertices = std::vector<glm::uvec3>(res_width * res_height);
+	auto indices = std::vector<glm::uvec3>(res_width * res_height);
 	unsigned int index = 0u;
 
 	for (unsigned int x = 0u; x < res_width; x++) {
@@ -22,6 +22,7 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned 
 			vertices[index] = glm::uvec3(static_cast<float>(x) * static_cast<float>(height) / static_cast<float>(res_height),
 										static_cast<float>(y) * static_cast<float>(width) / static_cast<float>(res_width),
 										0.0f);
+			index++;
 		}
 	}
 	index = 0;
@@ -66,7 +67,8 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned 
 	             indices.data(),
 	             GL_STATIC_DRAW);
 
-	data.indices_nb = (width * height) / (res_width * res_height);
+	//data.indices_nb = (width * height) / (res_width * res_height);
+	data.indices_nb = indices.size() * 3;
 
 	// All the data has been recorded, we can unbind them.
 	glBindVertexArray(0u);

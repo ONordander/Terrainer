@@ -140,6 +140,9 @@ edan35::Terrainer::run()
 
     auto const set_uniforms = [](GLuint /*program*/){};
 
+    auto quad_node = Node();
+    quad_node.set_geometry(quad);
+    quad_node.set_program(fallback_shader, set_uniforms);
 
     //
     // Setup textures
@@ -227,9 +230,11 @@ edan35::Terrainer::run()
 
         glCullFace(GL_FRONT);
         glDepthFunc(GL_ALWAYS);
+	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
         Log::View::Render();
+
 
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
         if (opened)
