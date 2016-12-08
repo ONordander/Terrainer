@@ -13,7 +13,7 @@ namespace parametric_shapes
 	//! @param height the height of the quad
 	//! @return wrapper around OpenGL objects' name containing the geometry
 	//!         data
-	eda221::mesh_data createQuad(unsigned int width, unsigned int height);
+	eda221::mesh_data createQuad(unsigned int width, unsigned int height, unsigned int res_width, unsigned int res_height);
 
 	//! \brief Create a sphere for some tesselation level and make it
 	//!        available to OpenGL.
