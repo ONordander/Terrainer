@@ -1,6 +1,7 @@
 #include "terrainer.hpp"
 #include "helpers.hpp"
 #include "node.hpp"
+#include "parametric_shapes.cpp"
 
 #include "config.hpp"
 #include "external/glad/glad.h"
@@ -105,6 +106,8 @@ edan35::Terrainer::run()
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
+
+    eda221::mesh_data quad = parametric_shapes::createQuad(100, 100, 100, 100);
 
     //
     // Load all the shader programs used
