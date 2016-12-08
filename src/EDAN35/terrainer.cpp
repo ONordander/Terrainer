@@ -144,7 +144,7 @@ edan35::Terrainer::run()
     quad_node.set_geometry(quad);
     quad_node.set_program(fallback_shader, set_uniforms);
 
-    //
+    /*
     // Setup textures
     //
     auto const diffuse_texture                     = eda221::createTexture(window_size.x, window_size.y);
@@ -154,8 +154,10 @@ edan35::Terrainer::run()
     auto const light_specular_contribution_texture = eda221::createTexture(window_size.x, window_size.y);
     auto const depth_texture                       = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
     auto const shadowmap_texture                   = eda221::createTexture(constant::shadowmap_res_x, constant::shadowmap_res_y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
+    */
 
 
+    /*
     //
     // Setup FBOs
     //
@@ -197,6 +199,7 @@ edan35::Terrainer::run()
         glUniform1i(glGetUniformLocation(program, name.c_str()), static_cast<GLint>(slot));
         glBindSampler(slot, sampler);
     };
+    */
 
     auto seconds_nb = 0.0f;
 
@@ -228,9 +231,10 @@ edan35::Terrainer::run()
             reload_shaders();
         }
 
-        glCullFace(GL_FRONT);
+        glCullFace(GL_BACK);
         glDepthFunc(GL_ALWAYS);
 	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
         Log::View::Render();
