@@ -92,20 +92,6 @@ edan35::Terrainer::~Terrainer()
 void
 edan35::Terrainer::run()
 {
-    // Load the geometry of Sponza
-    auto const sponza_geometry = eda221::loadObjects("../crysponza/sponza.obj");
-    if (sponza_geometry.empty()) {
-        LogError("Failed to load the Sponza model");
-        return;
-    }
-    std::vector<Node> sponza_elements;
-    sponza_elements.reserve(sponza_geometry.size());
-    for (auto const& shape : sponza_geometry) {
-        Node node;
-        node.set_geometry(shape);
-        sponza_elements.push_back(node);
-    }
-
     auto const window_size = window->GetDimensions();
 
     //
@@ -128,6 +114,7 @@ edan35::Terrainer::run()
         LogError("Failed to load fallback shader");
         return;
     }
+
     auto const reload_shader = [fallback_shader](std::string const& vertex_path, std::string const& fragment_path, GLuint& program){
         if (program != 0u && program != fallback_shader)
             glDeleteProgram(program);
@@ -137,6 +124,7 @@ edan35::Terrainer::run()
             program = fallback_shader;
         }
     };
+
     GLuint fill_gbuffer_shader = 0u, fill_shadowmap_shader = 0u, accumulate_lights_shader = 0u, resolve_deferred_shader = 0u;
     auto const reload_shaders = [&reload_shader,&fill_gbuffer_shader,&fill_shadowmap_shader,&accumulate_lights_shader,&resolve_deferred_shader](){
         LogInfo("Reloading shaders");
@@ -178,12 +166,14 @@ edan35::Terrainer::run()
         glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     });
+
     auto const depth_sampler = eda221::createSampler([](GLuint sampler){
         glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     });
+
     auto const shadow_sampler = eda221::createSampler([](GLuint sampler){
         glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -194,6 +184,7 @@ edan35::Terrainer::run()
         GLfloat border_color[4] = { 1.0f, 0.0f, 0.0f, 0.0f};
         glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, border_color);
     });
+
     auto const bind_texture_with_sampler = [](GLenum target, unsigned int slot, GLuint program, std::string const& name, GLuint texture, GLuint sampler){
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(target, texture);
@@ -201,37 +192,10 @@ edan35::Terrainer::run()
         glBindSampler(slot, sampler);
     };
 
-
-    //
-    // Setup lights properties
-    //
-    std::array<TRSTransform<float, glm::defaultp>, constant::lights_nb> lightTransforms;
-    std::array<glm::vec3, constant::lights_nb> lightColors;
-
-    for (size_t i = 0; i < constant::lights_nb; ++i) {
-        lightTransforms[i].SetTranslate(glm::vec3(0.0f, 125.0f, 0.0f));
-        lightColors[i] = glm::vec3(0.5f + 0.5f * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)),
-                                   0.5f + 0.5f * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)),
-                                   0.5f + 0.5f * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)));
-    }
-
-    TRSTransform<f32, glm::defaultp> coneScaleTransform = TRSTransform<f32, glm::defaultp>();
-    coneScaleTransform.SetScale(glm::vec3(sqrt(constant::light_intensity / constant::light_cutoff)));
-
-    TRSTransform<f32, glm::defaultp> lightOffsetTransform = TRSTransform<f32, glm::defaultp>();
-    lightOffsetTransform.SetTranslate(glm::vec3(0.0f, 0.0f, -40.0f));
-
-    auto lightProjection = glm::perspective(bonobo::pi * 0.5f,
-                                            static_cast<float>(constant::shadowmap_res_x) / static_cast<float>(constant::shadowmap_res_y),
-                                            1.0f, 10000.0f);
-
-
     auto seconds_nb = 0.0f;
-
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
 
     double ddeltatime;
     size_t fpsSamples = 0;
