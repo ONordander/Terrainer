@@ -1,7 +1,7 @@
 #include "terrainer.hpp"
 #include "helpers.hpp"
 #include "node.hpp"
-#include "parametric_shapes.cpp"
+#include "parametric_shapes.hpp"
 
 #include "config.hpp"
 #include "external/glad/glad.h"
@@ -101,12 +101,12 @@ edan35::Terrainer::run()
     FPSCameraf mCamera(bonobo::pi / 4.0f,
                        static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
                        1.0f, 10000.0f);
-    mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 100.0f, 180.0f));
+    mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 0.0f, 6.0f));
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
+    auto const quad = parametric_shapes::createQuad(100, 100, 100, 100);
 
-    eda221::mesh_data quad = parametric_shapes::createCircleRing(100, 100, 100, 100);
     if (quad.vao == 0u) {
         LogError("Failed to load quad shape");
         return;
@@ -206,13 +206,14 @@ edan35::Terrainer::run()
         glBindSampler(slot, sampler);
     };
     */
-    quad_node.scale(glm::vec3(8.0f, 8.0f, 8.0f));
+    //quad_node.scale(glm::vec3(8.0f, 8.0f, 8.0f));
+    quad_node.rotate_x(bonobo::pi/2);
 
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
 
     double ddeltatime;
     size_t fpsSamples = 0;
@@ -239,24 +240,27 @@ edan35::Terrainer::run()
             //reload_shaders();
         }
 
-        glCullFace(GL_BACK);
+        //glCullFace(GL_BACK);
         //glDepthFunc(GL_ALWAYS);
+        auto const window_size = window->GetDimensions();
         glViewport(0, 0, window_size.x, window_size.y);
         glClearDepthf(1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+        //quad_node.rotate_y(0.01f);
 	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
-        Log::View::Render();
 
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
         if (opened)
             ImGui::Text("%.3f ms", ddeltatime);
         ImGui::End();
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        Log::View::Render();
         ImGui::Render();
 
         window->Swap();

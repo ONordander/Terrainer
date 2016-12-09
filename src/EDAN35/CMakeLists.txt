@@ -27,6 +27,8 @@ set (
 	"../EDA221/node.hpp"
 	"../EDA221/helpers.cpp"
 	"../EDA221/helpers.hpp"
+	"../EDA221/parametric_shapes.cpp"
+	"../EDA221/parametric_shapes.hpp"
 )
 
 set (
