@@ -113,6 +113,8 @@ namespace eda221
 	GLuint createProgram(std::string const& vert_shader_source_path,
 	                     std::string const& frag_shader_source_path);
 
+	GLuint createProgramWithGeo(std::string const& base_dir, std::string const& vert_shader_source_path, std::string const& geo_shader_source_path,
+	                     std::string const& frag_shader_source_path);
 	//! \brief Display the current texture in the specified rectangle.
 	//!
 	//! @param [in] lower_left the lower left corner of the rectangle

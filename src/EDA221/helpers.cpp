@@ -352,6 +352,33 @@ eda221::createProgram(std::string const& vert_shader_source_path, std::string co
 	return program;
 }
 
+GLuint
+eda221::createProgramWithGeo(std::string const& base_dir, std::string const& vert_shader_source_path, std::string const& geo_shader_source_path, std::string const& frag_shader_source_path)
+{
+	auto const vertex_shader_source = utils::slurp_file(config::shaders_path(base_dir + vert_shader_source_path));
+	GLuint vertex_shader = utils::opengl::shader::generate_shader(GL_VERTEX_SHADER, vertex_shader_source);
+	if (vertex_shader == 0u)
+		return 0u;
+
+	auto const geo_shader_source = utils::slurp_file(config::shaders_path(base_dir + geo_shader_source_path));
+	GLuint geo_shader = utils::opengl::shader::generate_shader(GL_GEOMETRY_SHADER, geo_shader_source);
+	if (geo_shader == 0u)
+		return 0u;
+
+	auto const fragment_shader_source = utils::slurp_file(config::shaders_path(base_dir + frag_shader_source_path));
+	GLuint fragment_shader = utils::opengl::shader::generate_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
+	if (fragment_shader == 0u)
+		return 0u;
+
+	GLuint program = utils::opengl::shader::generate_program({ vertex_shader, geo_shader, fragment_shader });
+	glDeleteShader(vertex_shader);
+	glDeleteShader(geo_shader);
+	glDeleteShader(fragment_shader);
+	return program;
+}
+
+
+
 void
 eda221::displayTexture(glm::vec2 const& lower_left, glm::vec2 const& upper_right, GLuint texture, GLuint sampler, glm::ivec4 const& swizzle, glm::ivec2 const& window_size, FPSCameraf const* camera)
 {

@@ -105,13 +105,21 @@ edan35::Terrainer::run()
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
-    auto const quad = parametric_shapes::createQuad(2, 2, 10, 10);
 
+    /*
+        Create Quad
+    */
+    auto const quad = parametric_shapes::createQuad(2, 2, 10, 10);
     if (quad.vao == 0u) {
         LogError("Failed to load quad shape");
         return;
     }
 
+    auto marching_shader = eda221::createProgramWithGeo("TERRAINER/", "marching.vert", "marching.geo", "marching.frag");
+    if (marching_shader == 0u) {
+        LogError("Failed to load marching_shader");
+        return;
+    }
     //
     // Load all the shader programs used
     //
@@ -141,9 +149,19 @@ edan35::Terrainer::run()
     };
     reload_shaders();
     */
+
+    /*
+    /   Set up lighting
+    */
     auto const light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
-    auto const set_uniforms = [&light_position](GLuint program){
+    auto const light_ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular](GLuint program){
         glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+        glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
+        glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
+        glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
     };
 
     auto quad_node = Node();
