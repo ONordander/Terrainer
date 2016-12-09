@@ -163,8 +163,6 @@ edan35::Terrainer::run()
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
 
     double ddeltatime;
     size_t fpsSamples = 0;
@@ -184,6 +182,7 @@ edan35::Terrainer::run()
         glfwPollEvents();
         inputHandler->Advance();
         mCamera.Update(ddeltatime, *inputHandler);
+        quad_node.rotate_x(0.05f);
 
         ImGui_ImplGlfwGL3_NewFrame();
 
@@ -197,7 +196,6 @@ edan35::Terrainer::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        //quad_node.rotate_y(0.01f);
 	    quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
@@ -217,6 +215,8 @@ edan35::Terrainer::run()
 
     glDeleteProgram(fallback_shader);
     fallback_shader = 0u;
+    glDeleteProgram(marching_shader);
+    marching_shader = 0u;
 }
 
 int main()
