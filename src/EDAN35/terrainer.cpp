@@ -125,12 +125,12 @@ edan35::Terrainer::run()
     }
 
     auto const reload_shader = [fallback_shader](std::string const& vertex_path,
-                                                 std::string const& fragment_path,
                                                  std::string const& geo_path,
+                                                 std::string const& fragment_path,
                                                  GLuint& program) {
         if (program != 0u && program != fallback_shader)
             glDeleteProgram(program);
-        program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, fragment_path, geo_path);
+        program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, geo_path, fragment_path);
         if (program == 0u) {
             LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
             program = fallback_shader;
