@@ -115,11 +115,6 @@ edan35::Terrainer::run()
         return;
     }
 
-    auto marching_shader = eda221::createProgramWithGeo("TERRAINER/", "marching.vert", "marching.geo", "marching.frag");
-    if (marching_shader == 0u) {
-        LogError("Failed to load marching_shader");
-        return;
-    }
     //
     // Load all the shader programs used
     //
@@ -128,31 +123,27 @@ edan35::Terrainer::run()
         LogError("Failed to load fallback shader");
         return;
     }
-    /*
-    auto const reload_shader = [fallback_shader](std::string const& vertex_path, std::string const& fragment_path, GLuint& program){
+
+    auto const reload_shader = [fallback_shader](std::string const& vertex_path,
+                                                 std::string const& fragment_path,
+                                                 std::string const& geo_path,
+                                                 GLuint& program) {
         if (program != 0u && program != fallback_shader)
             glDeleteProgram(program);
-        program = eda221::createProgram("../EDAN35/" + vertex_path, "../EDAN35/" + fragment_path);
+        program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, fragment_path, geo_path);
         if (program == 0u) {
-            LogError("Failed to load \"%s\" and \"%s\"", vertex_path.c_str(), fragment_path.c_str());
+            LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
             program = fallback_shader;
         }
     };
 
-    GLuint fill_gbuffer_shader = 0u, fill_shadowmap_shader = 0u, accumulate_lights_shader = 0u, resolve_deferred_shader = 0u;
-    auto const reload_shaders = [&reload_shader,&fill_gbuffer_shader,&fill_shadowmap_shader,&accumulate_lights_shader,&resolve_deferred_shader](){
+    GLuint marching_shader = 0u;
+    auto const reload_shaders = [&reload_shader, &marching_shader]() {
         LogInfo("Reloading shaders");
-        reload_shader("fill_gbuffer.vert",      "fill_gbuffer.frag",      fill_gbuffer_shader);
-        reload_shader("fill_shadowmap.vert",    "fill_shadowmap.frag",    fill_shadowmap_shader);
-        reload_shader("accumulate_lights.vert", "accumulate_lights.frag", accumulate_lights_shader);
-        reload_shader("resolve_deferred.vert",  "resolve_deferred.frag",  resolve_deferred_shader);
+        reload_shader("marching.vert", "marching.geo", "marching.frag", marching_shader);
     };
     reload_shaders();
-    */
 
-    /*
-    /   Set up lighting
-    */
     auto const light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
     auto const light_ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -166,7 +157,7 @@ edan35::Terrainer::run()
 
     auto quad_node = Node();
     quad_node.set_geometry(quad);
-    quad_node.set_program(fallback_shader, set_uniforms);
+    quad_node.set_program(marching_shader, set_uniforms);
 
 
     auto seconds_nb = 0.0f;
@@ -197,7 +188,7 @@ edan35::Terrainer::run()
         ImGui_ImplGlfwGL3_NewFrame();
 
         if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
-            //reload_shaders();
+            reload_shaders();
         }
 
         auto const window_size = window->GetDimensions();
