@@ -36,6 +36,8 @@ set (
 
 	"terrainer.cpp"
 	"terrainer.hpp"
+	"marching_tables.cpp"
+	"marching_tables.hpp"
 )
 
 source_group (

@@ -2,6 +2,7 @@
 #include "helpers.hpp"
 #include "node.hpp"
 #include "parametric_shapes.hpp"
+#include "marching_tables.hpp"
 
 #include "config.hpp"
 #include "external/glad/glad.h"
@@ -94,6 +95,8 @@ void
 edan35::Terrainer::run()
 {
     auto const window_size = window->GetDimensions();
+    auto table = edan35::get_edge_table();
+    printf("size of table is: %zu\n", table.size());
 
     //
     // Setup the camera

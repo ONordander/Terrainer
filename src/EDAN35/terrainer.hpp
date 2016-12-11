@@ -7,7 +7,7 @@ class Window;
 
 namespace edan35
 {
-    //! \brief Wrapper class for Assignment 2
+    //! \brief Wrapper class for Terrainer
     class Terrainer {
     public:
         //! \brief Default constructor.
