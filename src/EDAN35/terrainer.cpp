@@ -27,6 +27,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
 #include <array>
 #include <cstdlib>
 #include <stdexcept>
@@ -105,6 +106,24 @@ edan35::Terrainer::run()
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
+
+    //cubemap parameters
+    auto cube_size = glm::vec3(32.0f, 32.0f, 32.0f);
+    auto cube_step = glm::vec3(1.0f, 1.0f, 1.0f) / cube_size;
+
+    //construct the cubemap grid
+    auto grid_data = std::vector<float>(cube_size.x*cube_size.y*cube_size.z*3);
+    int index = 0;
+    for (float k = -1.0f; k < 1.0f; k += cube_step.z) {
+	    for (float j = -1.0f; j < 1.0f; j += cube_step.y) {
+		    for (float i = -1.0f; i < 1.0f; i += cube_step.x) {
+			    grid_data[index] = i;
+			    grid_data[index + 1] = j;
+			    grid_data[index + 2] = k;
+			    index += 3;
+		    }
+	    }
+    }
 
     /*
         Create Quad
@@ -196,7 +215,8 @@ edan35::Terrainer::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	    quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
 
@@ -205,7 +225,6 @@ edan35::Terrainer::run()
             ImGui::Text("%.3f ms", ddeltatime);
         ImGui::End();
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         Log::View::Render();
         ImGui::Render();
 
