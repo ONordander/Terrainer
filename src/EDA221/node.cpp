@@ -49,7 +49,6 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world, GLuint program, std::
 
 	glBindVertexArray(_vao);
 	if (_has_indices) {
-		printf("hehehe\n");
 		glDrawElements(_drawing_mode, _indices_nb, GL_UNSIGNED_INT, reinterpret_cast<GLvoid const*>(0x0));
 	}
 	else {
