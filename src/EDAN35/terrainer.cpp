@@ -110,22 +110,10 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
 
-    //cubemap parameters
-    auto cube_size = glm::vec3(32.0f, 32.0f, 32.0f);
-    auto cube_step = glm::vec3(1.0f, 1.0f, 1.0f) / cube_size;
-
-    //construct the cubemap grid
-    auto grid_data = std::vector<float>(cube_size.x*cube_size.y*cube_size.z*3);
-    int index = 0;
-    for (float k = -1.0f; k < 1.0f; k += cube_step.z) {
-	    for (float j = -1.0f; j < 1.0f; j += cube_step.y) {
-		    for (float i = -1.0f; i < 1.0f; i += cube_step.x) {
-			    grid_data[index] = i;
-			    grid_data[index + 1] = j;
-			    grid_data[index + 2] = k;
-			    index += 3;
-		    }
-	    }
+    auto const cube = parametric_shapes::create_cube(32u);
+    if (cube.vao == 0u) {
+        LogError("Failed to load marching cube");
+        return;
     }
 
     /*
@@ -181,7 +169,6 @@ edan35::Terrainer::run()
     quad_node.set_geometry(quad);
     quad_node.set_program(marching_shader, set_uniforms);
 
-
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
@@ -219,7 +206,7 @@ edan35::Terrainer::run()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
+        quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
 

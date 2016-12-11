@@ -8,4 +8,5 @@ namespace edan35
     };
 
     edge_tables get_edge_tables();
+
 }

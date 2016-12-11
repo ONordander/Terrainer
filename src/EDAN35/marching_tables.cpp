@@ -1,5 +1,8 @@
 #include "marching_tables.hpp"
 
+#include <vector>
+#include <cassert>
+
 edan35::edge_tables
 edan35::get_edge_tables()
 {
