@@ -70,6 +70,7 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned 
 
 	//data.indices_nb = (width * height) / (res_width * res_height);
 	data.indices_nb = indices.size() * 3;
+	data.vertices_nb = vertices.size() * 3u;
 
 	// All the data has been recorded, we can unbind them.
 	glBindVertexArray(0u);
@@ -267,6 +268,7 @@ parametric_shapes::create_cube(unsigned int cube_size)
 
     glBindVertexArray(0u);
     glBindBuffer(GL_ARRAY_BUFFER, 0u);
+    data.vertices_nb = vertices_nb * 3u;
 
     return data;
 }
