@@ -164,13 +164,8 @@ edan35::Terrainer::run()
         glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
     };
 
-    auto quad_node = Node();
-    quad_node.set_geometry(quad);
-    quad_node.set_program(marching_shader, set_uniforms);
-    quad_node.set_has_indices(false);
-
     auto cube_node = Node();
-    cube_node.set_geometry(cube);
+    cube_node.set_geometry(quad);
     cube_node.set_program(marching_shader, set_uniforms);
     cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
 
@@ -196,7 +191,7 @@ edan35::Terrainer::run()
         glfwPollEvents();
         inputHandler->Advance();
         mCamera.Update(ddeltatime, *inputHandler);
-        quad_node.rotate_x(0.05f);
+        cube_node.rotate_x(0.05f);
 
         ImGui_ImplGlfwGL3_NewFrame();
 
@@ -211,8 +206,7 @@ edan35::Terrainer::run()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
-	cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
+        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
