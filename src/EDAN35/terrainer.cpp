@@ -97,7 +97,6 @@ edan35::Terrainer::run()
 {
     auto const window_size = window->GetDimensions();
     auto table = edan35::get_edge_tables();
-    printf("element number 12 in edge table %d\n", table.edge_table[12]);
 
     //
     // Setup the camera
