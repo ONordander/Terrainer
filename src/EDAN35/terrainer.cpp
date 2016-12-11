@@ -110,7 +110,7 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(32u);
+    auto const cube = parametric_shapes::create_cube(4u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
@@ -168,6 +168,7 @@ edan35::Terrainer::run()
     auto quad_node = Node();
     quad_node.set_geometry(quad);
     quad_node.set_program(marching_shader, set_uniforms);
+    quad_node.set_has_indices(false);
 
     auto seconds_nb = 0.0f;
 
@@ -205,7 +206,6 @@ edan35::Terrainer::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
 
         GLStateInspection::View::Render();
