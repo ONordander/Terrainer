@@ -169,6 +169,11 @@ edan35::Terrainer::run()
     quad_node.set_geometry(quad);
     quad_node.set_program(marching_shader, set_uniforms);
 
+    auto cube_node = Node();
+    cube_node.set_geometry(cube);
+    cube_node.set_program(marching_shader, set_uniforms);
+    cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
+
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
@@ -205,8 +210,10 @@ edan35::Terrainer::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
+	cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
 
