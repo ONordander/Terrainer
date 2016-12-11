@@ -1,7 +1,6 @@
 #version 410
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 1) out;
 
 void main()
 {
