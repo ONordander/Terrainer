@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Node::Node() : _vao(0u), _vertices_nb(0u), _indices_nb(0u), _drawing_mode(GL_TRIANGLES), _has_indices(true), _program(0u), _textures(), _scaling(1.0f, 1.0f, 1.0f), _rotation(), _translation(), _children()
+Node::Node() : _vao(0u), _vertices_nb(0u), _indices_nb(0u), _drawing_mode(GL_POINTS), _has_indices(true), _program(0u), _textures(), _scaling(1.0f, 1.0f, 1.0f), _rotation(), _translation(), _children()
 {
 }
 
@@ -48,10 +48,13 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world, GLuint program, std::
 	glUniform1i(glGetUniformLocation(program, "has_opacity_texture"), has_opacity_texture);
 
 	glBindVertexArray(_vao);
-	if (_has_indices)
+	if (_has_indices) {
+		printf("hehehe\n");
 		glDrawElements(_drawing_mode, _indices_nb, GL_UNSIGNED_INT, reinterpret_cast<GLvoid const*>(0x0));
-	else
+	}
+	else {
 		glDrawArrays(_drawing_mode, 0, _vertices_nb);
+	}
 	glBindVertexArray(0u);
 
 	glUseProgram(0u);
@@ -62,9 +65,9 @@ Node::set_geometry(eda221::mesh_data const& shape)
 {
 	_vao = shape.vao;
 	_vertices_nb = static_cast<GLsizei>(shape.vertices_nb);
-	_indices_nb = static_cast<GLsizei>(shape.indices_nb);
-	_drawing_mode = shape.drawing_mode;
-	_has_indices = shape.ibo != 0u;
+	_indices_nb = 0; //static_cast<GLsizei>(shape.indices_nb);
+	_drawing_mode = GL_POINTS; //shape.drawing_mode;
+	_has_indices = false; //shape.ibo != 0u;
 
 	if (!shape.bindings.empty()) {
 		for (auto const& binding : shape.bindings)
@@ -89,6 +92,12 @@ void
 Node::set_indices_nb(size_t const& indices_nb)
 {
 	_indices_nb = static_cast<GLsizei>(indices_nb);
+}
+
+void
+Node::set_has_indices(bool has_indices)
+{
+	_has_indices = has_indices;
 }
 
 void

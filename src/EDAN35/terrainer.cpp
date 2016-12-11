@@ -110,7 +110,7 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(32u);
+    auto const cube = parametric_shapes::create_cube(4u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
@@ -168,6 +168,7 @@ edan35::Terrainer::run()
     auto quad_node = Node();
     quad_node.set_geometry(quad);
     quad_node.set_program(marching_shader, set_uniforms);
+    quad_node.set_has_indices(false);
 
     auto cube_node = Node();
     cube_node.set_geometry(cube);

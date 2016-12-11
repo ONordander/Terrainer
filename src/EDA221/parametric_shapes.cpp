@@ -244,18 +244,17 @@ parametric_shapes::create_cube(unsigned int cube_size)
     auto vertices_nb = cube_size * cube_size * cube_size;
     auto vertices = std::vector<glm::vec3>(vertices_nb);
     size_t index = 0;
-    float cube_step = static_cast<float>(2.0f / cube_size);
+    float cube_step = static_cast<float>(2.0 / cube_size);
     for (float k = -1.0f; k < 1.0f; k += cube_step) {
         for (float j = -1.0f; j < 1.0f; j += cube_step) {
             for (float i = -1.0f; i < 1.0f; i += cube_step) {
-            	vertices[index] = glm::vec3(i, j, k);
-		index++;
+            	vertices[index] = glm::vec3(k, j, i);
+            	++index;
             }
         }
     } 
 
     eda221::mesh_data data;
-    data.vertices_nb = vertices_nb;
     glGenVertexArrays(1, &data.vao);
     assert(data.vao != 0u);
     glBindVertexArray(data.vao);

@@ -58,6 +58,8 @@ public:
 	//! @param [in] indices_nb how many indices to use when rendering
 	void set_indices_nb(size_t const& indices_nb);
 
+	void set_has_indices(bool has_indices);
+
 	//! \brief Set the program of this node.
 	//!
 	//! A node without a program will not render itself, but its children
