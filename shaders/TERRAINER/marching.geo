@@ -1,8 +1,9 @@
 #version 410
 
 layout(points) in;
-layout(points, max_vertices = 1) out;
+layout(triangle_strip, max_vertices = 3) out;
 
+uniform sampler2D cube_tex;
 uniform float cube_step;
 
 float density(vec3 world_pos)
@@ -14,12 +15,13 @@ void main()
 {
 	gl_Position = gl_in[0].gl_Position;
 	EmitVertex();
-	//gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
-	//EmitVertex();
-	//gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
-	//EmitVertex();
-	//EndPrimitive();
-	
+	gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
+	EmitVertex();
+	gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
+	EmitVertex();
+	EndPrimitive();
+
+	/*
 	//sample at cube corners
 	//corner 0
 	float d0 = density(gl_Position.xyz);
@@ -56,5 +58,6 @@ void main()
 		lookup_idx |= (1 << 6);
 	if (d7 > 0)
 		lookup_idx |= (1 << 7);
+	*/
 }
 

@@ -2,11 +2,6 @@
 
 namespace edan35 
 {
-    struct edge_tables {
-        int edge_connections[256][16];
-        int edge_table[256];
-    };
-
-    edge_tables get_edge_tables();
-
+    void get_edge_table(int edge_table[]);
+    void get_edge_connections(int edge_connections[][20]);
 }
