@@ -1,7 +1,7 @@
 #version 410
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 3) out;
+layout(points, max_vertices = 1) out;
 
 uniform float cube_step;
 
@@ -14,11 +14,11 @@ void main()
 {
 	gl_Position = gl_in[0].gl_Position;
 	EmitVertex();
-	gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
-	EmitVertex();
-	gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
-	EmitVertex();
-	EndPrimitive();
+	//gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
+	//EmitVertex();
+	//gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
+	//EmitVertex();
+	//EndPrimitive();
 	
 	//sample at cube corners
 	//corner 0

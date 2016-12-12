@@ -161,8 +161,8 @@ edan35::Terrainer::run()
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
-    cube_node.scale(glm::vec3(50.0f, 50.0f, 50.0f));
-    cube_node.translate(glm::vec3(-25.0f, -25.0f, -3.0f));
+    cube_node.scale(glm::vec3(32.0f, 32.0f, 32.0f));
+    cube_node.translate(glm::vec3(-16.0f, -16.0f, -6.0f));
 
     //try to load the noise volumes as a 3d texture
     auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
