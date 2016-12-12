@@ -77,7 +77,7 @@ namespace eda221
 	                     GLvoid const* data = nullptr);
 
 	GLuint create_table_tex(uint32_t width, uint32_t height,
-							GLenum target, GLvoid const* data);
+							GLenum target, GLint internal, GLenum format, int *data);
 
 	//! \brief Load a PNG image into an OpenGL 2D-texture.
 	//!

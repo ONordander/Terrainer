@@ -159,13 +159,11 @@ edan35::Terrainer::run()
 	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
-    auto cube_tex = eda221::create_table_tex(256, 1, GL_TEXTURE_2D, &_edge_table);
-    auto edge_connections = eda221::create_table_tex(256, 20, GL_TEXTURE_2D, &_edge_connections);
+    auto cube_tex = eda221::create_table_tex(256, 0, GL_TEXTURE_1D, GL_R8I, GL_RED_INTEGER, _edge_table);
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
     cube_node.add_texture("cube_tex", cube_tex);
-    cube_node.add_texture("edge_conn", edge_connections);
     cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
 
     //try to load the noise volumes as a 3d texture
