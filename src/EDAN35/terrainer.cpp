@@ -117,7 +117,6 @@ edan35::Terrainer::run()
         return;
     }
     float const cube_step = static_cast<float>(2.0f / 16u);
-
     //
     // Load all the shader programs used
     //

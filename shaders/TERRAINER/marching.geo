@@ -320,6 +320,7 @@ vec3 interp(int index, float densities[8])
 		float i_factor = mix(densities[3], densities[7], densities[7] - densities[3]);
 		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor);
 	}
+	return vec3(0.0f);
 }
 
 void main()
@@ -333,7 +334,6 @@ void main()
 	EmitVertex();
 	EndPrimitive();
 	*/
-
 	
 	float densities[8];
 	//sample at cube corners
