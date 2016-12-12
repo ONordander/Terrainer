@@ -105,6 +105,9 @@ namespace eda221
                                   std::string const& negz, std::string const& posz,
                                   bool generate_mipmap = false);
 
+	//load volume data as 3d texture
+	GLuint load_volume_texture(std::string const& filename);
+
 	//! \brief Create an OpenGL program consisting of a vertex and a
 	//!        fragment shader.
 	//!
