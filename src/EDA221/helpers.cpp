@@ -234,26 +234,27 @@ eda221::createTexture(uint32_t width, uint32_t height, GLenum target, GLint inte
 	glBindTexture(target, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(target, 0, internal_format, static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, format, type, data);
+	glTexImage2D(target, 0, internal_format, static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, format, type, reinterpret_cast<GLvoid const*>(data));
 	glBindTexture(target, 0u);
 
 	return texture;
 }
 
 GLuint
-eda221::create_table_tex(uint32_t width, uint32_t height, GLenum target, GLvoid const* data)
+eda221::create_table_tex(uint32_t width, uint32_t height, GLenum target, GLint internal, GLenum format, int *data)
 {
+	//printf("%u\n", data[1]);
 	GLuint texture = 0u;
 	glGenTextures(1, &texture);
 	assert(texture != 0u);
 	glBindTexture(target, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	printf("w: %u h: %u\n", width, height);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target, 0, 0x8D8A, static_cast<GLsizei>(width), static_cast<float>(height), 0, 0x8D97, GL_INT, data);
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//printf("w: %u h: %u\n", width, height);
+	glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage1D(target, 0, internal, static_cast<GLsizei>(width), 0, format, GL_INT, data);
 	return texture;
 }
 

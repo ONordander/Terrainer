@@ -19,3 +19,5 @@ log.txt
 *.vcxproj.user
 
 *.DS_Store*
+tags
+*.swp

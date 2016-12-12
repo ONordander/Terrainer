@@ -159,8 +159,7 @@ edan35::Terrainer::run()
 	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
-    auto cube_tex = eda221::create_table_tex(256, 1, GL_TEXTURE_2D, &_edge_table);
-    auto edge_connections = eda221::create_table_tex(256, 20, GL_TEXTURE_2D, &_edge_connections);
+    auto cube_tex = eda221::create_table_tex(256, 0, GL_TEXTURE_1D, GL_R8I, GL_RED_INTEGER, _edge_table);
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
