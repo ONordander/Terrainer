@@ -49,6 +49,7 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world, GLuint program, std::
 
 	glBindVertexArray(_vao);
 	if (_has_indices) {
+		printf("using the indices");
 		glDrawElements(_drawing_mode, _indices_nb, GL_UNSIGNED_INT, reinterpret_cast<GLvoid const*>(0x0));
 	}
 	else {
@@ -65,7 +66,7 @@ Node::set_geometry(eda221::mesh_data const& shape)
 	_vao = shape.vao;
 	_vertices_nb = static_cast<GLsizei>(shape.vertices_nb);
 	_indices_nb = 0; //static_cast<GLsizei>(shape.indices_nb);
-	_drawing_mode = GL_TRIANGLES; //shape.drawing_mode;
+	_drawing_mode = shape.drawing_mode;
 	_has_indices = false; //shape.ibo != 0u;
 
 	if (!shape.bindings.empty()) {

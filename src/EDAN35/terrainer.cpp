@@ -106,23 +106,16 @@ edan35::Terrainer::run()
                        1.0f, 10000.0f);
     mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 0.0f, 6.0f));
     mCamera.mMouseSensitivity = 0.003f;
-    mCamera.mMovementSpeed = 0.25f;
+    mCamera.mMovementSpeed = 0.15f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(4u);
+    auto const cube = parametric_shapes::create_cube(32u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
+    float const cube_step = static_cast<float>(2.0f / 32u);
 
-    /*
-        Create Quad
-    */
-    auto const quad = parametric_shapes::createQuad(2, 2, 10, 10);
-    if (quad.vao == 0u) {
-        LogError("Failed to load quad shape");
-        return;
-    }
 
     //
     // Load all the shader programs used
@@ -157,21 +150,28 @@ edan35::Terrainer::run()
     auto const light_ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-    auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular](GLuint program){
+    auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular, &cube_step](GLuint program){
         glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
         glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
         glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
         glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
+	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
     auto cube_node = Node();
-    cube_node.set_geometry(quad);
+    cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
-    cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
+    cube_node.scale(glm::vec3(50.0f, 50.0f, 50.0f));
+    cube_node.translate(glm::vec3(-25.0f, -25.0f, -3.0f));
+
+    //try to load the noise volumes as a 3d texture
+    auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
 
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     double ddeltatime;
     size_t fpsSamples = 0;
@@ -191,7 +191,6 @@ edan35::Terrainer::run()
         glfwPollEvents();
         inputHandler->Advance();
         mCamera.Update(ddeltatime, *inputHandler);
-        cube_node.rotate_x(0.05f);
 
         ImGui_ImplGlfwGL3_NewFrame();
 

@@ -260,6 +260,23 @@ eda221::loadTexture2D(std::string const& filename, bool generate_mipmap)
 }
 
 GLuint
+eda221::load_volume_texture(std::string const& filename)
+{
+	u32 width, height;
+	auto const data = getTextureData("noise_tex/" + filename, width, height, true);
+	if (data.empty())
+		return 0u;
+	GLuint texture = eda221::createTexture(width, height, GL_TEXTURE_3D, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, reinterpret_cast<GLvoid const*>(data.data()));
+	glBindTexture(GL_TEXTURE_3D, texture);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_3D);
+	glBindTexture(GL_TEXTURE_3D, 0u);
+	return texture;
+}
+
+
+GLuint
 eda221::loadTextureCubeMap(std::string const& posx, std::string const& negx,
                            std::string const& posy, std::string const& negy,
                            std::string const& negz, std::string const& posz,

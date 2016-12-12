@@ -13,16 +13,18 @@
 eda221::mesh_data
 parametric_shapes::createQuad(unsigned int width, unsigned int height, unsigned int res_width, unsigned int res_height)
 {
-	auto vertices = std::vector<glm::vec3>(res_width * res_height);
+	auto vertices = std::vector<glm::vec3>(res_width * res_height * 10);
 	auto indices = std::vector<glm::uvec3>(2 * (res_width - 1) * (res_height - 1));
 	size_t index = 0u;
 
 	for (unsigned int x = 0u; x < res_width; x++) {
 		for (unsigned int y = 0u; y < res_height; y++) {
-			vertices[index] = glm::vec3(static_cast<float>(x) * static_cast<float>(width) / static_cast<float>(res_width),
-										static_cast<float>(y) * static_cast<float>(height) / static_cast<float>(res_height),
-										0.0f);
-			++index;
+			for (unsigned int z = 0u; z < 10; z++) {
+				vertices[index] = glm::vec3(static_cast<float>(x) * static_cast<float>(width) / static_cast<float>(res_width),
+											static_cast<float>(y) * static_cast<float>(height) / static_cast<float>(res_height),
+											static_cast<float>(z) * static_cast<float>(2) / static_cast<float>(10));
+				++index;
+			}
 		}
 	}
 
@@ -242,33 +244,48 @@ parametric_shapes::createCircleRing(unsigned int const res_radius,
 eda221::mesh_data
 parametric_shapes::create_cube(unsigned int cube_size)
 {
-    auto vertices_nb = cube_size * cube_size * cube_size;
-    auto vertices = std::vector<glm::vec3>(vertices_nb);
-    size_t index = 0;
-    float cube_step = static_cast<float>(2.0 / cube_size);
-    for (float k = -1.0f; k < 1.0f; k += cube_step) {
-        for (float j = -1.0f; j < 1.0f; j += cube_step) {
-            for (float i = -1.0f; i < 1.0f; i += cube_step) {
-            	vertices[index] = glm::vec3(k, j, i);
-            	++index;
-            }
-        }
-    } 
+	auto vertices = std::vector<glm::vec3>(cube_size * cube_size * cube_size);
+	size_t index = 0u;
 
-    eda221::mesh_data data;
-    glGenVertexArrays(1, &data.vao);
-    assert(data.vao != 0u);
-    glBindVertexArray(data.vao);
+	for (float x = -1; x < 1; x += (2.0f / cube_size)) {
+		for (float y = -1; y < 1; y += (2.0f / cube_size)) {
+			for (float z = -1; z < 1; z += (2.0f / cube_size)) {
+				vertices[index] = glm::vec3(static_cast<float>(x),
+											static_cast<float>(y),
+											static_cast<float>(z));
+				++index;
+			}
+		}
+	}
 
-    glGenBuffers(1, &data.bo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(vertices.size() * sizeof(glm::vec3)),
-                 vertices.data(),
-                 GL_STATIC_DRAW);
+	eda221::mesh_data data;
+	data.drawing_mode = GL_POINTS; 
+	glGenVertexArrays(1, &data.vao);
 
-    glBindVertexArray(0u);
-    glBindBuffer(GL_ARRAY_BUFFER, 0u);
-    data.vertices_nb = vertices_nb * 3u;
+	glBindVertexArray(data.vao);
 
-    return data;
+	glGenBuffers(1, &data.bo);
+
+	glBindBuffer(GL_ARRAY_BUFFER, data.bo);
+	glBufferData(GL_ARRAY_BUFFER,
+				 static_cast<GLsizeiptr>(vertices.size() * sizeof(glm::vec3)),
+	             vertices.data(),
+	             GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(static_cast<unsigned int>(eda221::shader_bindings::vertices));
+
+	glVertexAttribPointer(static_cast<unsigned int>(eda221::shader_bindings::vertices),
+	                      3,
+	                      GL_FLOAT,
+	                      GL_FALSE,
+	                      0,
+	                      reinterpret_cast<GLvoid const*>(0x0));
+
+	data.vertices_nb = vertices.size() * 3u;
+
+	// All the data has been recorded, we can unbind them.
+	glBindVertexArray(0u);
+	glBindBuffer(GL_ARRAY_BUFFER, 0u);
+
+	return data;
 }
