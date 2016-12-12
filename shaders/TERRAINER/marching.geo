@@ -320,21 +320,11 @@ vec3 interp(int index, float densities[8])
 		float i_factor = mix(densities[3], densities[7], densities[7] - densities[3]);
 		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor);
 	}
+	return vec3(0.0f);
 }
 
 void main()
 {
-	/*
-	gl_Position = gl_in[0].gl_Position;
-	EmitVertex();
-
-    gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
-    EmitVertex();
-
-    gl_Position = gl_in[0].gl_Position + vec4(0.0f, 5.0f, 0.0f, 0.0f);
-    EmitVertex();
-    EndPrimitive();
-    */
 	
 	float densities[8];
 	//sample at cube corners
@@ -378,7 +368,11 @@ void main()
 		return;
 
 	int cases = edge_table[lookup_idx];
-	for (int i = 0; i < cases; i++) {
+	int i = 0;
+	while (true) {
+		if (edge_conn[20*lookup_idx + i*4] == -1) {
+			break;
+		}
 		ivec3 edges = ivec3(edge_conn[20*lookup_idx + i*4],
 					edge_conn[20*lookup_idx + i*4 + 1],
 					edge_conn[20*lookup_idx + i*4 + 2]);
@@ -389,6 +383,7 @@ void main()
 		gl_Position = vec4(interp(edges.z, densities), 1.0);
 		EmitVertex();
 		EndPrimitive();
+		i++;
 	}
 }
 

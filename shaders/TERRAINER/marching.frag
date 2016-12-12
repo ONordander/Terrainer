@@ -7,10 +7,5 @@ uniform isampler2D edge_conn;
 
 void main()
 {
-    vec4 col = texelFetch(cube_tex, 1, 0);
-    if (col.r > 0) {
-        frag_color = vec4(0.3f);
-        return;
-    }
     frag_color = vec4(1.0, 1.0, 1.0, 1.0f);
 }

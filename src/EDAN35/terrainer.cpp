@@ -116,7 +116,7 @@ edan35::Terrainer::run()
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0f / 32u);
+    float const cube_step = static_cast<float>(2.0f / 4.0);
 
     //
     // Load all the shader programs used
