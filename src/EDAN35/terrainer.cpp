@@ -33,6 +33,9 @@
 #include <cstdlib>
 #include <stdexcept>
 
+extern int _edge_table[256];
+extern int _edge_connections[256][20];
+
 enum class polygon_mode_t : unsigned int {
     fill = 0u,
     line,
@@ -96,7 +99,6 @@ void
 edan35::Terrainer::run()
 {
     auto const window_size = window->GetDimensions();
-    auto table = edan35::get_edge_tables();
 
     //
     // Setup the camera
@@ -112,15 +114,6 @@ edan35::Terrainer::run()
     auto const cube = parametric_shapes::create_cube(8u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
-        return;
-    }
-
-    /*
-        Create Quad
-    */
-    auto const quad = parametric_shapes::createQuad(2, 2, 10, 10);
-    if (quad.vao == 0u) {
-        LogError("Failed to load quad shape");
         return;
     }
 
@@ -164,16 +157,14 @@ edan35::Terrainer::run()
         glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
     };
 
+    auto cube_tex = eda221::create_table_tex(256, 1, GL_TEXTURE_2D, &_edge_table);
+    auto edge_connections = eda221::create_table_tex(256, 20, GL_TEXTURE_2D, &_edge_connections);
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
+    cube_node.add_texture("cube_tex", cube_tex);
+    cube_node.add_texture("edge_conn", edge_connections);
     cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
-
-    auto quad_node = Node();
-    quad_node.set_geometry(quad);
-    quad_node.set_program(marching_shader, set_uniforms);
-    quad_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
-    quad_node.translate(glm::vec3(-40.0f, 0.0f, 0.0f));
 
     auto seconds_nb = 0.0f;
 
@@ -212,7 +203,6 @@ edan35::Terrainer::run()
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
-        //quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();

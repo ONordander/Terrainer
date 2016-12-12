@@ -241,6 +241,23 @@ eda221::createTexture(uint32_t width, uint32_t height, GLenum target, GLint inte
 }
 
 GLuint
+eda221::create_table_tex(uint32_t width, uint32_t height, GLenum target, GLvoid const* data)
+{
+	GLuint texture = 0u;
+	glGenTextures(1, &texture);
+	assert(texture != 0u);
+	glBindTexture(target, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	printf("w: %u h: %u\n", width, height);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage2D(target, 0, 0x8D8A, static_cast<GLsizei>(width), static_cast<float>(height), 0, 0x8D97, GL_INT, data);
+	return texture;
+}
+
+GLuint
 eda221::loadTexture2D(std::string const& filename, bool generate_mipmap)
 {
 	u32 width, height;
