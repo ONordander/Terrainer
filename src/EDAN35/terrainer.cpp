@@ -33,8 +33,8 @@
 #include <cstdlib>
 #include <stdexcept>
 
-extern int _edge_table[256];
-extern int _edge_connections[256][20];
+//extern int _edge_table[256];
+//extern int _edge_connections[256][20];
 
 enum class polygon_mode_t : unsigned int {
     fill = 0u,
@@ -111,12 +111,12 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.15f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(4u);
+    auto const cube = parametric_shapes::create_cube(16u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0f / 32u);
+    float const cube_step = static_cast<float>(2.0f / 16u);
 
     //
     // Load all the shader programs used
@@ -159,22 +159,22 @@ edan35::Terrainer::run()
 	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
-    auto cube_tex = eda221::create_table_tex(256, 0, GL_TEXTURE_1D, GL_R8I, GL_RED_INTEGER, _edge_table);
+    //auto cube_tex = eda221::create_table_tex(256, 0, GL_TEXTURE_1D, GL_R8I, GL_RED_INTEGER, _edge_table);
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
     cube_node.scale(glm::vec3(50.0f, 50.0f, 50.0f));
     //cube_node.translate(glm::vec3(-16.0f, -16.0f, -6.0f));
-    cube_node.add_texture("cube_tex", cube_tex);
-    cube_node.add_texture("edge_conn", edge_connections);
+    //cube_node.add_texture("cube_tex", cube_tex);
+    //cube_node.add_texture("edge_conn", edge_connections);
 
     //try to load the noise volumes as a 3d texture
     //auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
 
     double ddeltatime;
     size_t fpsSamples = 0;

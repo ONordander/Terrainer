@@ -332,27 +332,27 @@ void main()
 	gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
 	EmitVertex();
 	EndPrimitive();
+	*/
 
-	/*
 	
 	float densities[8];
 	//sample at cube corners
 	//corner 0
-	densities[0] = density(gl_Position.xyz);
+	densities[0] = density(gl_in[0].gl_Position.xyz);
 	//corner 1
-	densities[1] = density(vec3(gl_Position.x, gl_Position.y + cube_step, gl_Position.z));
+	densities[1] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z));
 	//corner 2
-	densities[2] = density(vec3(gl_Position.x + cube_step, gl_Position.y + cube_step, gl_Position.z));
+	densities[2] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z));
 	//corner 3
-	densities[3] = density(vec3(gl_Position.x + cube_step, gl_Position.y, gl_Position.z));	
+	densities[3] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z));	
 	//corner 4
-	densities[4] = density(vec3(gl_Position.x, gl_Position.y, gl_Position.z + cube_step));
+	densities[4] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step));
 	//corner 5
-	densities[5] = density(vec3(gl_Position.x, gl_Position.y + cube_step, gl_Position.z + cube_step));
+	densities[5] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step));
 	//corner 6
-	densities[6] = density(vec3(gl_Position.x + cube_step, gl_Position.y + cube_step, gl_Position.z + cube_step));
+	densities[6] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step));
 	//corner 7
-	densities[7] = density(vec3(gl_Position.x + cube_step, gl_Position.y, gl_Position.z + cube_step));
+	densities[7] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step));
 	
 	int lookup_idx;
 
@@ -376,8 +376,10 @@ void main()
 	if (lookup_idx == 0 || lookup_idx == 255)
 		return;
 
-	int cases = edge_table[lookup_idx];
-	for (int i = 0; i < cases; i++) {
+	int i = 0;
+	while (true) {
+		if (edge_conn[20*lookup_idx + i * 4] == -1 || i > 5)
+			break;
 		ivec3 edges = ivec3(edge_conn[20*lookup_idx + i*4],
 					edge_conn[20*lookup_idx + i*4 + 1],
 					edge_conn[20*lookup_idx + i*4 + 2]);
@@ -388,6 +390,6 @@ void main()
 		gl_Position = vec4(interp(edges.z, densities), 1.0);
 		EmitVertex();
 		EndPrimitive();
+		i++;
 	}
 }
-
