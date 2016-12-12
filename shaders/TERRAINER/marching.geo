@@ -325,6 +325,15 @@ vec3 interp(int index, float densities[8])
 
 void main()
 {
+	/*
+	gl_Position = gl_in[0].gl_Position;
+	EmitVertex();
+	gl_Position = gl_in[0].gl_Position + vec4(2.0f, 0.0f, 0.0f, 0.0f);
+	EmitVertex();
+	gl_Position = gl_in[0].gl_Position + vec4(0.0f, 2.0f, 0.0f, 0.0f);
+	EmitVertex();
+	EndPrimitive();
+	*/
 	
 	float densities[8];
 	//sample at cube corners
