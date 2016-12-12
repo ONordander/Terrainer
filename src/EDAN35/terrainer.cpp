@@ -109,7 +109,7 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.25f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(4u);
+    auto const cube = parametric_shapes::create_cube(8u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
@@ -165,9 +165,15 @@ edan35::Terrainer::run()
     };
 
     auto cube_node = Node();
-    cube_node.set_geometry(quad);
+    cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
     cube_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
+
+    auto quad_node = Node();
+    quad_node.set_geometry(quad);
+    quad_node.set_program(marching_shader, set_uniforms);
+    quad_node.scale(glm::vec3(25.0f, 25.0f, 25.0f));
+    quad_node.translate(glm::vec3(-40.0f, 0.0f, 0.0f));
 
     auto seconds_nb = 0.0f;
 
@@ -191,7 +197,6 @@ edan35::Terrainer::run()
         glfwPollEvents();
         inputHandler->Advance();
         mCamera.Update(ddeltatime, *inputHandler);
-        cube_node.rotate_x(0.05f);
 
         ImGui_ImplGlfwGL3_NewFrame();
 
@@ -207,6 +212,7 @@ edan35::Terrainer::run()
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
+        //quad_node.render(mCamera.GetWorldToClipMatrix(), quad_node.get_transform());
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
