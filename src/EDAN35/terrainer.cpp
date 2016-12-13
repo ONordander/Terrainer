@@ -174,9 +174,6 @@ edan35::Terrainer::run()
     cube_node.set_program(marching_shader, set_uniforms);
     cube_node.scale(glm::vec3(50.0f, 50.0f, 50.0f));
     cube_node.add_texture("edge_tex", edge_tex, GL_TEXTURE_1D);
-    //cube_node.translate(glm::vec3(-16.0f, -16.0f, -6.0f));
-    //cube_node.add_texture("cube_tex", cube_tex);
-    //cube_node.add_texture("edge_conn", edge_connections);
     auto noise_tex = eda221::loadTexture2D("noise.png");
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
