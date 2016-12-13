@@ -20,6 +20,6 @@ void main()
 
     vec4 light_diffuse = vec4(vec3(0.9, 0.9, 0.9) * max(dot(N, L), 0.0f), 0.0);
     vec4 light_specular = vec4(vec3(1.0, 1.0, 1.0) * pow(max(dot(V, R), 0.0), 100.0f), 0.0);
-    //frag_color = vec4(light_diffuse.xyz + light_specular.xyz, 1.0);
-    frag_color = vec4(N, 1.0);
+    frag_color = vec4(light_diffuse.xyz + light_specular.xyz, 1.0);
+    //frag_color = vec4(N, 1.0);
 }
