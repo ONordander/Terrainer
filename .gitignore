@@ -21,3 +21,4 @@ log.txt
 *.DS_Store*
 tags
 *.swp
+*.swo

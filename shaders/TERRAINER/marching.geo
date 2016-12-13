@@ -5,6 +5,8 @@ layout(triangle_strip, max_vertices = 15) out;
 
 uniform sampler2D cube_tex;
 uniform float cube_step;
+uniform mat4 vertex_world_to_clip;
+uniform mat4 vertex_model_to_world;
 
 const int edge_table[256] = int[256](0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,2,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,3,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,3,2,3,3,2,3,4,4,3,3,4,4,3,4,5,5,2,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,3,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,4,2,3,3,4,3,4,2,3,3,4,4,5,4,5,3,2,3,4,4,3,4,5,3,2,4,5,5,4,5,2,4,1,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,3,2,3,3,4,3,4,4,5,3,2,4,3,4,3,5,2,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,4,3,4,4,3,4,5,5,4,4,3,5,2,5,4,2,1,2,3,3,4,3,4,4,5,3,4,4,5,2,3,3,2,3,4,4,5,4,5,5,2,4,3,5,4,3,2,4,1,3,4,4,5,4,5,3,4,4,5,5,2,3,4,2,1,2,3,3,2,3,4,2,1,3,2,4,1,2,1,1,0);
 
@@ -265,62 +267,62 @@ const int edge_conn[20*256] = int[20*256](-1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
 
-float density(vec3 world_pos)
+float density(vec4 world_pos)
 {
 	return -world_pos.y;
 }
 
-vec3 interp(int index, float densities[8])
+vec4 interp(int index, float densities[8])
 {
 	if (index == 0) {
 		float i_factor = mix(densities[0], densities[1], densities[1] - densities[0]);
-		return vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + i_factor * cube_step, gl_in[0].gl_Position.z);
+		return vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + i_factor * cube_step, gl_in[0].gl_Position.z, 1.0f);
 	}
 	if (index == 1) {
 		float i_factor = mix(densities[1], densities[2], densities[2] - densities[1]);
-		return vec3(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z);
+		return vec4(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z, 1.0f);
 	}
 	if (index == 2) {
 		float i_factor = mix(densities[2], densities[3], densities[3] - densities[2]);
-		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z);
+		return vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z, 1.0f);
 	}
 	if (index == 3) {
 		float i_factor = mix(densities[0], densities[3], densities[3] - densities[0]);
-		return vec3(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z);
+		return vec4(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z, 1.0f);
 	}
 	if (index == 4) {
 		float i_factor = mix(densities[4], densities[5], densities[5] - densities[4]);
-		return vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z + cube_step);
+		return vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z + cube_step, 1.0f);
 	}
 	if (index == 5) {
 		float i_factor = mix(densities[5], densities[6], densities[6] - densities[5]);
-		return vec3(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step);
+		return vec4(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step, 1.0f);
 	}
 	if (index == 6) {
 		float i_factor = mix(densities[6], densities[7], densities[7] - densities[6]);
-		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z + cube_step);
+		return vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step * i_factor, gl_in[0].gl_Position.z + cube_step, 1.0f);
 	}
 	if (index == 7) {
 		float i_factor = mix(densities[4], densities[7], densities[7] - densities[4]);
-		return vec3(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor);
+		return vec4(gl_in[0].gl_Position.x + cube_step * i_factor, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor, 1.0f);
 	}
 	if (index == 8) {
 		float i_factor = mix(densities[0], densities[4], densities[4] - densities[0]);
-		return vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor);
+		return vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor, 1.0f);
 	}
 	if (index == 9) {
 		float i_factor = mix(densities[1], densities[5], densities[5] - densities[1]);
-		return vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step * i_factor);
+		return vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step * i_factor, 1.0f);
 	}
 	if (index == 10) {
 		float i_factor = mix(densities[2], densities[6], densities[6] - densities[2]);
-		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step * i_factor);
+		return vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step * i_factor, 1.0f);
 	}
 	if (index == 11) {
 		float i_factor = mix(densities[3], densities[7], densities[7] - densities[3]);
-		return vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor);
+		return vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step * i_factor, 1.0f);
 	}
-	return vec3(0.0f);
+	return vec4(0.0f);
 }
 
 void main()
@@ -338,40 +340,48 @@ void main()
 	float densities[8];
 	//sample at cube corners
 	//corner 0
-	densities[0] = density(gl_in[0].gl_Position.xyz);
+	densities[0] = density(vertex_model_to_world * gl_in[0].gl_Position);
 	//corner 1
-	densities[1] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z));
+	densities[1] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z, 1.0f));
 	//corner 2
-	densities[2] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z));
+	densities[2] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z, 1.0f));
 	//corner 3
-	densities[3] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z));	
+	densities[3] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z, 1.0f));	
 	//corner 4
-	densities[4] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step));
+	densities[4] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step, 1.0f));
 	//corner 5
-	densities[5] = density(vec3(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step));
+	densities[5] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step, 1.0f));
 	//corner 6
-	densities[6] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step));
+	densities[6] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y + cube_step, gl_in[0].gl_Position.z + cube_step, 1.0f));
 	//corner 7
-	densities[7] = density(vec3(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step));
+	densities[7] = density(vertex_model_to_world * vec4(gl_in[0].gl_Position.x + cube_step, gl_in[0].gl_Position.y, gl_in[0].gl_Position.z + cube_step, 1.0f));
 	
-	int lookup_idx;
+	int lookup_idx = 0;
 
-	if (densities[0] > 0)
-		lookup_idx |= (1 << 0);
-	if (densities[1] > 0)
-		lookup_idx |= (1 << 1);
-	if (densities[2] > 0)
-		lookup_idx |= (1 << 2);
-	if (densities[3] > 0)
-		lookup_idx |= (1 << 3);
-	if (densities[4] > 0)
-		lookup_idx |= (1 << 4);
-	if (densities[5] > 0)
-		lookup_idx |= (1 << 5);
-	if (densities[6] > 0)
-		lookup_idx |= (1 << 6);
-	if (densities[7] > 0)
-		lookup_idx |= (1 << 7);
+	if (densities[0] < 0)
+		//lookup_idx |= (1 << 0);
+		lookup_idx += 1;
+	if (densities[1] < 0)
+		//lookup_idx |= (1 << 1);
+		lookup_idx += 2;
+	if (densities[2] < 0)
+		//lookup_idx |= (1 << 2);
+		lookup_idx += 4;
+	if (densities[3] < 0)
+		//lookup_idx |= (1 << 3);
+		lookup_idx += 8;
+	if (densities[4] < 0)
+		//lookup_idx |= (1 << 4);
+		lookup_idx += 16;
+	if (densities[5] < 0)
+		//lookup_idx |= (1 << 5);
+		lookup_idx += 32;
+	if (densities[6] < 0)
+		//lookup_idx |= (1 << 6);
+		lookup_idx += 64;
+	if (densities[7] < 0)
+		//lookup_idx |= (1 << 7);
+		lookup_idx += 128;
 
 	if (lookup_idx == 0 || lookup_idx == 255)
 		return;
@@ -383,13 +393,14 @@ void main()
 		ivec3 edges = ivec3(edge_conn[20*lookup_idx + i*4],
 					edge_conn[20*lookup_idx + i*4 + 1],
 					edge_conn[20*lookup_idx + i*4 + 2]);
-		gl_Position = vec4(interp(edges.x, densities), 1.0);
+		gl_Position = vertex_world_to_clip * vertex_model_to_world * interp(edges.x, densities);
 		EmitVertex();
-		gl_Position = vec4(interp(edges.y, densities), 1.0);
+		gl_Position = vertex_world_to_clip * vertex_model_to_world * interp(edges.y, densities);
 		EmitVertex();
-		gl_Position = vec4(interp(edges.z, densities), 1.0);
+		gl_Position = vertex_world_to_clip * vertex_model_to_world * interp(edges.z, densities);
 		EmitVertex();
 		EndPrimitive();
 		i++;
 	}
+	//*/
 }

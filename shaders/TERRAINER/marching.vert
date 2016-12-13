@@ -8,5 +8,5 @@ uniform mat4 vertex_world_to_clip;
 
 void main()
 {
-    gl_Position = vertex_world_to_clip * vertex_model_to_world * vec4(vertex, 1.0);
+    gl_Position = vec4(vertex, 1.0);
 }
