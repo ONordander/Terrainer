@@ -111,12 +111,12 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.05f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(32u);
+    auto const cube = parametric_shapes::create_cube(64u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0 / 32.0);
+    float const cube_step = static_cast<float>(2.0 / 64.0);
     //
     // Load all the shader programs used
     //
@@ -146,7 +146,7 @@ edan35::Terrainer::run()
     };
     reload_shaders();
 
-    auto const light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
+    auto const light_position = glm::vec3(0.0f, 0.0f, -2.0f);
     auto const light_ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -243,7 +243,7 @@ edan35::Terrainer::run()
         auto const window_size = window->GetDimensions();
         glViewport(0, 0, window_size.x, window_size.y);
         glClearDepthf(1.0f);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
