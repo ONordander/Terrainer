@@ -36,6 +36,10 @@
 //extern int _edge_table[256];
 //extern int _edge_connections[256][20];
 
+#define NOISE_X 16
+#define NOISE_Y 16
+#define NOISE_Z 16
+
 enum class polygon_mode_t : unsigned int {
     fill = 0u,
     line,
@@ -111,6 +115,21 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.15f;
     window->SetCamera(&mCamera);
 
+    //3D Noise
+    double noise[NOISE_X][NOISE_Y][NOISE_Z];
+    for (int x = 0; x < NOISE_X; x++)
+	    for (int y = 0; y < NOISE_Y; y++)
+		    for (int z = 0; z < NOISE_Z; z++)
+			    noise[x][y][z] = (rand() % 32768) / 32768.0f;
+    GLuint noise_tex = 0u;
+    glGenTextures(1, &noise_tex);
+    assert(noise_tex != 0u);
+    glBindTexture(GL_TEXTURE_3D, noise_tex);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage3D(GL_TEXTURE_3D, 0u, GL_RED, NOISE_X, NOISE_Y, NOISE_Z, 0u, GL_RED, GL_FLOAT, noise);
+    glBindTexture(noise_tex, 0u);
+
     auto const cube = parametric_shapes::create_cube(16u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
@@ -167,8 +186,6 @@ edan35::Terrainer::run()
     //cube_node.add_texture("cube_tex", cube_tex);
     //cube_node.add_texture("edge_conn", edge_connections);
 
-    //try to load the noise volumes as a 3d texture
-    //auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
@@ -193,7 +210,6 @@ edan35::Terrainer::run()
         glfwPollEvents();
         inputHandler->Advance();
         mCamera.Update(ddeltatime, *inputHandler);
-
         ImGui_ImplGlfwGL3_NewFrame();
 
         if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
@@ -206,9 +222,9 @@ edan35::Terrainer::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
 

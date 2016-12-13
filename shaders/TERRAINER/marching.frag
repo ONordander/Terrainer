@@ -2,7 +2,10 @@
 
 out vec4 frag_color;
 
+uniform sampler3D noise_tex;
+
 void main()
 {
-    frag_color = vec4(0.0, 0.5, 0.5, 1.0f);
+	vec4 col = texture(noise_tex, gl_Position);
+    frag_color = vec4(col.xyz, 1.0f);
 }
