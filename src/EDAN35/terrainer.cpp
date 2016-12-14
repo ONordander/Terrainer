@@ -47,19 +47,6 @@ static polygon_mode_t get_next_mode(polygon_mode_t mode)
     return static_cast<polygon_mode_t>((static_cast<unsigned int>(mode) + 1u) % 3u);
 }
 
-namespace constant
-{
-    constexpr uint32_t shadowmap_res_x = 1024;
-    constexpr uint32_t shadowmap_res_y = 1024;
-
-    constexpr size_t lights_nb           = 4;
-    constexpr float  light_intensity     = 720000.0f;
-    constexpr float  light_angle_falloff = 0.8f;
-    constexpr float  light_cutoff        = 0.05f;
-}
-
-static eda221::mesh_data loadCone();
-
 edan35::Terrainer::Terrainer()
 {
     Log::View::Init();
@@ -117,6 +104,7 @@ edan35::Terrainer::run()
         return;
     }
     float const cube_step = static_cast<float>(2.0 / 64.0);
+
     //
     // Load all the shader programs used
     //
@@ -182,7 +170,26 @@ edan35::Terrainer::run()
     for (int y = 0; y < 32; y++)
     for (int x = 0; x < 32; x++)
     for (int z = 0; z < 32; z++) {
-        noise[z][y][x] = (rand() % 32768) / 32768.0;
+        noise[x][y][z] = y - 7.f + 0.6f*cos(x*rand() / (10.0f + rand() % 3) + rand()) - 0.5f*sin(z / (30.f + rand() % 10) + rand() % 2) + 1 / (rand() % 4 + 1);
+
+                // Create mountain
+                if (fabs(18.0f + rand() % 5 - x)*fabs(18.0f + rand() % 6 - x) + fabs(15.0f + rand() % 5 - z)*fabs(15.0f + rand() % 4 - z) < 35 && y < 20 - rand() % 3)
+                {
+                    noise[x][y][z] = -1;
+                }
+
+                // Create bay
+                if (fabs(10.0f + rand() % 10 - x)*fabs(10.0f + rand() % 10 - x) + fabs(25.0f + rand() % 7 - z)*fabs(25.0f + rand() % 7 - z) < 35)
+                {
+                    noise[x][y][z] = 1;
+                }
+
+                // Round off terrain
+                if (fabs(15.0f - z)*fabs(15.0f - z) + fabs(15.0f - x)*fabs(15.0f - x) >  (13.0f + rand() % 2)*(15.0f + rand() % 2))
+                {
+                    noise[x][y][z] = 1;
+                }
+        //noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
     GLuint noise_t = 0u;
     glGenTextures(1, &noise_t);
