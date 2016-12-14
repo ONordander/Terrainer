@@ -196,6 +196,7 @@ edan35::Terrainer::run()
     double nowTime, lastTime = GetTimeMilliseconds();
     double fpsNextTick = lastTime + 1000.0;
     GLuint mode = 0u;
+	glClearColor(0.53f, 0.83f, 0.98f, 1.0f);
 
     while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
         nowTime = GetTimeMilliseconds();
@@ -226,7 +227,6 @@ edan35::Terrainer::run()
 
         auto const window_size = window->GetDimensions();
         glClearDepthf(1.0f);
-        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	//render pass 1, build the density volume
