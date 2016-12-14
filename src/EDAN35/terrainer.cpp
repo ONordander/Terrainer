@@ -167,7 +167,7 @@ edan35::Terrainer::run()
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
     //set up shader programs for the first pass
-    GLuint density_shader = eda221::createProgramWithGeo("TERRAINER/", "density.vert", "density.geo", "density.frag");
+    GLuint density_shader = eda221::createProgram("density.vert", "density.frag", "TERRAINER/");
     //Set up el buffero
 	auto const density_texture = eda221::create_3D_texture(33, 33, 33); //magic numbers
 	auto const depth_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
@@ -179,8 +179,9 @@ edan35::Terrainer::run()
     for (int z = 0; z < 32; z++) {
 	noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
-    GLuint noise_t = eda221::create_3D_texture(32, 32, 32, GL_R32F, GL_RED, GL_FLOAT, noise);
+    GLuint const noise_t = eda221::create_3D_texture(32, 32, 32, GL_R32F, GL_RED, GL_FLOAT, noise);
     cube_node.add_texture("noise_t", noise_t, GL_TEXTURE_3D);
+    cube_node.add_texture("density_t", density_texture, GL_TEXTURE_3D);
 
     auto seconds_nb = 0.0f;
 

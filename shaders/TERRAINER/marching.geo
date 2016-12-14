@@ -9,6 +9,7 @@ out vec3 vertex;
 uniform isampler1D edge_tex;
 uniform sampler2D noise_tex;
 uniform sampler3D noise_t;
+uniform sampler3D density_t;
 uniform float cube_step;
 uniform mat4 vertex_world_to_clip;
 uniform mat4 vertex_model_to_world;
@@ -63,13 +64,8 @@ float turbulence(vec4 world_pos, float initial_size)
 
 float density(vec4 world_pos)
 {
-	//return (world_pos, 32.0f);
-	return smooth_noise(world_pos);
-	//return (texture(noise_t, ((world_pos.xyz + 1) / 2)).r * 2) - 1;
-	//return (texture(noise_tex, world_pos.xy).r * 2) - 1;
-	//return -world_pos.y;
+	return texture(density_t, (world_pos.xyz + 1) / 2.0).r;
 }
-
 
 vec4 interp(int index, float densities[8])
 {

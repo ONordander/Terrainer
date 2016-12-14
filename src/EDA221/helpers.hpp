@@ -124,7 +124,8 @@ namespace eda221
 	//!             code, relative to the `shaders/EDA221` folder
 	//! @return the name of the OpenGL shader program
 	GLuint createProgram(std::string const& vert_shader_source_path,
-	                     std::string const& frag_shader_source_path);
+	                     std::string const& frag_shader_source_path,
+	                     std::string const& base_dir = "EDA221/");
 
 	GLuint createProgramWithGeo(std::string const& base_dir, std::string const& vert_shader_source_path, std::string const& geo_shader_source_path,
 	                     std::string const& frag_shader_source_path);
