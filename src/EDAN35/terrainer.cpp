@@ -166,30 +166,16 @@ edan35::Terrainer::run()
     auto noise_tex = eda221::loadTexture2D("noise.png");
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
+    //Set up el buffero
+	auto const density_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_3D);
+	auto const depth_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
+	auto const density_fbo = eda221::createFBO({density_texture}, depth_texture);
+	
     float noise[32][32][32];
     for (int y = 0; y < 32; y++)
     for (int x = 0; x < 32; x++)
     for (int z = 0; z < 32; z++) {
-        noise[x][y][z] = y - 7.f + 0.6f*cos(x*rand() / (10.0f + rand() % 3) + rand()) - 0.5f*sin(z / (30.f + rand() % 10) + rand() % 2) + 1 / (rand() % 4 + 1);
-
-                // Create mountain
-                if (fabs(18.0f + rand() % 5 - x)*fabs(18.0f + rand() % 6 - x) + fabs(15.0f + rand() % 5 - z)*fabs(15.0f + rand() % 4 - z) < 35 && y < 20 - rand() % 3)
-                {
-                    noise[x][y][z] = -1;
-                }
-
-                // Create bay
-                if (fabs(10.0f + rand() % 10 - x)*fabs(10.0f + rand() % 10 - x) + fabs(25.0f + rand() % 7 - z)*fabs(25.0f + rand() % 7 - z) < 35)
-                {
-                    noise[x][y][z] = 1;
-                }
-
-                // Round off terrain
-                if (fabs(15.0f - z)*fabs(15.0f - z) + fabs(15.0f - x)*fabs(15.0f - x) >  (13.0f + rand() % 2)*(15.0f + rand() % 2))
-                {
-                    noise[x][y][z] = 1;
-                }
-        //noise[z][y][x] = (rand() % 32768) / 32768.0;
+        noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
     GLuint noise_t = 0u;
     glGenTextures(1, &noise_t);
@@ -252,6 +238,11 @@ edan35::Terrainer::run()
         glClearDepthf(1.0f);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	//render pass 1, build the density volume
+	glBindFrameBuffer(GL_FRAMEBUFFER, density_fbo);
+	GLenum const density_draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, density_draw_buffers);
 
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
 
