@@ -466,7 +466,7 @@ GLuint
 eda221::createFBO(std::vector<GLuint> const& color_attachments, GLuint depth_attachment)
 {
 	auto const attach = [](GLenum attach_point, GLuint attachment){
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attach_point, GL_TEXTURE_2D, attachment, 0);
+		glFramebufferTexture3D(GL_FRAMEBUFFER, attach_point, GL_TEXTURE_3D, attachment, 0, 0);
 		auto const status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 			LogError("Failed to attach %u at %u", attachment, attach_point);

@@ -167,7 +167,7 @@ edan35::Terrainer::run()
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
     //set up shader programs for the first pass
-    GLuint density_program = eda221::createProgramWithGeo("TERRAINER/", "density.vert", "density.geo", "density.frag");
+    GLuint density_shader = eda221::createProgramWithGeo("TERRAINER/", "density.vert", "density.geo", "density.frag");
     //Set up el buffero
 	auto const density_texture = eda221::create_3D_texture(33, 33, 33); //magic numbers
 	auto const depth_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
@@ -232,12 +232,18 @@ edan35::Terrainer::run()
 	glBindFramebuffer(GL_FRAMEBUFFER, density_fbo);
 	GLenum const density_draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
 	glDrawBuffers(1, density_draw_buffers);
+	auto const status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+		LogError("Something went wrong when generating density values");
         glViewport(0, 0, window_size.x, window_size.y);
-        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform(), density_program, set_uniforms);
-
         glClear(GL_DEPTH_BUFFER_BIT);
+        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform(), density_shader, set_uniforms);
+
 	//pass 2, just straight up rendering
-        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glViewport(0, 0, window_size.x, window_size.y);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0u); //remember to unbind after done
+        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform(), marching_shader, set_uniforms);
 
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
