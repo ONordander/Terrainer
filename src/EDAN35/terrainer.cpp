@@ -98,12 +98,12 @@ edan35::Terrainer::run()
     mCamera.mMovementSpeed = 0.05f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(64u);
+    auto const cube = parametric_shapes::create_cube(32u);
     if (cube.vao == 0u) {
 	LogError("Failed to load marching cube");
 	return;
     }
-    float const cube_step = static_cast<float>(2.0 / 64.0);
+    float const cube_step = static_cast<float>(2.0 / 32.0);
 
     //
     // Load all the shader programs used
@@ -172,17 +172,7 @@ edan35::Terrainer::run()
     for (int z = 0; z < 32; z++) {
 	noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
-    GLuint noise_t = 0u;
-    glGenTextures(1, &noise_t);
-    assert(noise_t != 0u);
-    glBindTexture(GL_TEXTURE_3D, noise_t);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, 32, 32, 32, 0, GL_RED, GL_FLOAT, noise);
-    glBindTexture(GL_TEXTURE_3D, 0u);
+    GLuint noise_t = eda221::create_3D_texture(32, 32, 32, GL_R32F, GL_RED, GL_FLOAT, noise);
     cube_node.add_texture("noise_t", noise_t, GL_TEXTURE_3D);
 
     //try to load the noise volumes as a 3d texture

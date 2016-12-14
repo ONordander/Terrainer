@@ -80,7 +80,7 @@ namespace eda221
 	GLuint create_3D_texture(uint32_t width, uint32_t height, uint32_t depth,
 							 GLint internal_format = GL_R32I,
 							 GLenum format = GL_RED_INTEGER,
-							 GLENUM type = GL_INT,
+							 GLenum type = GL_INT,
 							 GLvoid const* data = nullptr);
 
 	GLuint create_table_tex(uint32_t width, uint32_t height,
