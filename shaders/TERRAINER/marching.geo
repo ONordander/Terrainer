@@ -67,10 +67,11 @@ float turbulence(vec4 world_pos, float initial_size)
 float density(vec4 world_pos)
 {
 	//return (world_pos, 32.0f);
-	return smooth_noise(world_pos);
+	float density = -world_pos.y;
+	density += smooth_noise(world_pos);
 	//return (texture(noise_t, ((world_pos.xyz + 1) / 2)).r * 2) - 1;
 	//return (texture(noise_tex, world_pos.xy).r * 2) - 1;
-	//return -world_pos.y;
+	return density;
 }
 
 
@@ -174,15 +175,13 @@ void main()
 		vec4 v_1 = interp(edge_1, densities);
 		vec4 v_2 = interp(edge_2, densities);
 		vec4 v_3 = interp(edge_3, densities);
-		normal = normalize(cross(v_2.xyz - v_1.xyz, v_3.xyz - v_1.xyz));
+		normal = (cross(v_2.xyz - v_1.xyz, v_3.xyz - v_1.xyz));
 		vertex = v_1.xyz;
 		gl_Position = vertex_world_to_clip * vertex_model_to_world * v_1;
 		EmitVertex();
-		normal = normalize(cross(v_1.xyz - v_2.xyz, v_3.xyz - v_2.xyz));
 		vertex = v_2.xyz;
 		gl_Position = vertex_world_to_clip * vertex_model_to_world * v_2;
 		EmitVertex();
-		normal = normalize(cross(v_1.xyz - v_3.xyz, v_2.xyz - v_3.xyz));
 		vertex = v_3.xyz;
 		gl_Position = vertex_world_to_clip * vertex_model_to_world * v_3;
 		EmitVertex();
