@@ -26,6 +26,8 @@ namespace edan35
         //! render loop.
         void run();
 
+        int* create_edge_conn();
+
     private:
         InputHandler *inputHandler;
         Window       *window;
