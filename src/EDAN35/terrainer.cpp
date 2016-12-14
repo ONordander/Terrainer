@@ -166,6 +166,8 @@ edan35::Terrainer::run()
     auto noise_tex = eda221::loadTexture2D("noise.png");
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
+    //set up shader programs for the first pass
+    GLuint density_program = eda221::createProgramWithGeo("TERRAINER/", "density.vert", "density.geo", "density.frag");
     //Set up el buffero
 	auto const density_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_3D);
 	auto const depth_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
@@ -240,9 +242,9 @@ edan35::Terrainer::run()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	//render pass 1, build the density volume
-	glBindFrameBuffer(GL_FRAMEBUFFER, density_fbo);
+	//glBindFramebuffer(GL_FRAMEBUFFER, density_fbo);
 	GLenum const density_draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, density_draw_buffers);
+	//glDrawBuffers(1, density_draw_buffers);
 
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
 
