@@ -241,6 +241,23 @@ eda221::createTexture(uint32_t width, uint32_t height, GLenum target, GLint inte
 }
 
 GLuint
+eda221::create_3D_texture(uint32_t width, uint32_t height, uint32_t depth, GLint internal_format, GLenum format, GLenum type, GLvoid const* data)
+{
+	GLuint texture = 0u;
+	glGenTextures(1, &texture);
+	assert(texture != 0u);
+	glBindTexture(GL_TEXTURE_3D, texture);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage3D(GL_TEXTURE_3D, 0, internal_format, width, height, depth, 0, format, type, data);
+    glBindTexture(GL_TEXTURE_3D, 0u);
+	return texture;
+}
+
+GLuint
 eda221::create_table_tex(uint32_t width, uint32_t height, GLenum target, GLint internal, GLenum format, int *data)
 {
 	//printf("%u\n", data[1]);

@@ -52,10 +52,10 @@ edan35::Terrainer::Terrainer()
     Log::View::Init();
 
     window = Window::Create("Terrainer", config::resolution_x,
-                            config::resolution_y, config::msaa_rate, false, false);
+			    config::resolution_y, config::msaa_rate, false, false);
     if (window == nullptr) {
-        Log::View::Destroy();
-        throw std::runtime_error("Failed to get a window: aborting!");
+	Log::View::Destroy();
+	throw std::runtime_error("Failed to get a window: aborting!");
     }
     inputHandler = new InputHandler();
     window->SetInputHandler(inputHandler);
@@ -91,46 +91,46 @@ edan35::Terrainer::run()
     // Setup the camera
     //
     FPSCameraf mCamera(bonobo::pi / 4.0f,
-                       static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
-                       1.0f, 10000.0f);
+		       static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
+		       1.0f, 10000.0f);
     mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 2.0f, 6.0f));
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.05f;
     window->SetCamera(&mCamera);
 
-    auto const cube = parametric_shapes::create_cube(64u);
+    auto const cube = parametric_shapes::create_cube(32u);
     if (cube.vao == 0u) {
-        LogError("Failed to load marching cube");
-        return;
+	LogError("Failed to load marching cube");
+	return;
     }
-    float const cube_step = static_cast<float>(2.0 / 64.0);
+    float const cube_step = static_cast<float>(2.0 / 32.0);
 
     //
     // Load all the shader programs used
     //
     auto fallback_shader = eda221::createProgram("fallback.vert", "fallback.frag");
     if (fallback_shader == 0u) {
-        LogError("Failed to load fallback shader");
-        return;
+	LogError("Failed to load fallback shader");
+	return;
     }
 
     auto const reload_shader = [fallback_shader](std::string const& vertex_path,
-                                                 std::string const& geo_path,
-                                                 std::string const& fragment_path,
-                                                 GLuint& program) {
-        if (program != 0u && program != fallback_shader)
-            glDeleteProgram(program);
-        program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, geo_path, fragment_path);
-        if (program == 0u) {
-            LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
-            program = fallback_shader;
-        }
+						 std::string const& geo_path,
+						 std::string const& fragment_path,
+						 GLuint& program) {
+	if (program != 0u && program != fallback_shader)
+	    glDeleteProgram(program);
+	program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, geo_path, fragment_path);
+	if (program == 0u) {
+	    LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
+	    program = fallback_shader;
+	}
     };
 
     GLuint marching_shader = 0u;
     auto const reload_shaders = [&reload_shader, &marching_shader]() {
-        LogInfo("Reloading shaders");
-        reload_shader("marching.vert", "marching.geo", "marching.frag", marching_shader);
+	LogInfo("Reloading shaders");
+	reload_shader("marching.vert", "marching.geo", "marching.frag", marching_shader);
     };
     reload_shaders();
 
@@ -139,12 +139,12 @@ edan35::Terrainer::run()
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular, &cube_step, &mCamera](GLuint program){
-        glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
-        glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
-        glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
-        glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
-        glUniform4fv(glGetUniformLocation(program, "camera_pos"), 1, glm::value_ptr(mCamera.mWorld.GetTranslation()));
-    	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
+	glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+	glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
+	glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
+	glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
+	glUniform4fv(glGetUniformLocation(program, "camera_pos"), 1, glm::value_ptr(mCamera.mWorld.GetTranslation()));
+	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
     int* edge_conn = create_edge_conn();
@@ -169,7 +169,7 @@ edan35::Terrainer::run()
     //set up shader programs for the first pass
     GLuint density_program = eda221::createProgramWithGeo("TERRAINER/", "density.vert", "density.geo", "density.frag");
     //Set up el buffero
-	auto const density_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_3D);
+	auto const density_texture = eda221::create_3D_texture(33, 33, 33); //magic numbers
 	auto const depth_texture = eda221::createTexture(window_size.x, window_size.y, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
 	auto const density_fbo = eda221::createFBO({density_texture}, depth_texture);
 	
@@ -177,23 +177,11 @@ edan35::Terrainer::run()
     for (int y = 0; y < 32; y++)
     for (int x = 0; x < 32; x++)
     for (int z = 0; z < 32; z++) {
-        noise[z][y][x] = (rand() % 32768) / 32768.0;
+	noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
-    GLuint noise_t = 0u;
-    glGenTextures(1, &noise_t);
-    assert(noise_t != 0u);
-    glBindTexture(GL_TEXTURE_3D, noise_t);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, 32, 32, 32, 0, GL_RED, GL_FLOAT, noise);
-    glBindTexture(GL_TEXTURE_3D, 0u);
+    GLuint noise_t = eda221::create_3D_texture(32, 32, 32, GL_R32F, GL_RED, GL_FLOAT, noise);
     cube_node.add_texture("noise_t", noise_t, GL_TEXTURE_3D);
 
-    //try to load the noise volumes as a 3d texture
-    //auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
@@ -236,16 +224,19 @@ edan35::Terrainer::run()
         glPolygonMode(GL_FRONT_AND_BACK, mode);
 
         auto const window_size = window->GetDimensions();
-        glViewport(0, 0, window_size.x, window_size.y);
         glClearDepthf(1.0f);
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	//render pass 1, build the density volume
-	//glBindFramebuffer(GL_FRAMEBUFFER, density_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, density_fbo);
 	GLenum const density_draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-	//glDrawBuffers(1, density_draw_buffers);
+	glDrawBuffers(1, density_draw_buffers);
+        glViewport(0, 0, window_size.x, window_size.y);
+        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform(), density_program, set_uniforms);
 
+        glClear(GL_DEPTH_BUFFER_BIT);
+	//pass 2, just straight up rendering
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
 
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
@@ -271,7 +262,7 @@ int*
 edan35::Terrainer::create_edge_conn()
 {
     static int edge_conn[256*20] = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      1, 8, 3, -1, 9, 8, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -536,10 +527,10 @@ int main()
 {
     Bonobo::Init();
     try {
-        edan35::Terrainer terrainer;
-        terrainer.run();
+	edan35::Terrainer terrainer;
+	terrainer.run();
     } catch (std::runtime_error const& e) {
-        LogError(e.what());
+	LogError(e.what());
     }
     Bonobo::Destroy();
 }
