@@ -175,8 +175,6 @@ edan35::Terrainer::run()
     GLuint noise_t = eda221::create_3D_texture(32, 32, 32, GL_R32F, GL_RED, GL_FLOAT, noise);
     cube_node.add_texture("noise_t", noise_t, GL_TEXTURE_3D);
 
-    //try to load the noise volumes as a 3d texture
-    //auto noise_tex = eda221::load_volume_texture("packednoise_half_16cubed_mips_00.vol");
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
