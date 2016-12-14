@@ -112,9 +112,10 @@ edan35::Terrainer::run()
                        1.0f, 10000.0f);
     mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 2.0f, 6.0f));
     mCamera.mMouseSensitivity = 0.003f;
-    mCamera.mMovementSpeed = 0.15f;
+    mCamera.mMovementSpeed = 0.05f;
     window->SetCamera(&mCamera);
 
+    /*
     //3D Noise
     double noise[NOISE_X][NOISE_Y][NOISE_Z];
     for (int x = 0; x < NOISE_X; x++)
@@ -129,6 +130,7 @@ edan35::Terrainer::run()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage3D(GL_TEXTURE_3D, 0u, GL_RED, NOISE_X, NOISE_Y, NOISE_Z, 0u, GL_RED, GL_FLOAT, noise);
     glBindTexture(noise_tex, 0u);
+    */
 
     auto const cube = parametric_shapes::create_cube(32u);
     if (cube.vao == 0u) {
@@ -165,15 +167,16 @@ edan35::Terrainer::run()
     };
     reload_shaders();
 
-    auto const light_position = glm::vec3(-2.0f, 4.0f, 2.0f);
+    auto const light_position = glm::vec3(0.0f, 0.0f, -2.0f);
     auto const light_ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-    auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular, &cube_step](GLuint program){
+    auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular, &cube_step, &mCamera](GLuint program){
         glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
         glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
         glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
         glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
+        glUniform4fv(glGetUniformLocation(program, "camera_pos"), 1, glm::value_ptr(mCamera.mWorld.GetTranslation()));
     	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
@@ -191,21 +194,43 @@ edan35::Terrainer::run()
     auto cube_node = Node();
     cube_node.set_geometry(cube);
     cube_node.set_program(marching_shader, set_uniforms);
-    cube_node.scale(glm::vec3(50.0f, 50.0f, 50.0f));
+    cube_node.scale(glm::vec3(5.0f, 5.0f, 5.0f));
     cube_node.add_texture("edge_tex", edge_tex, GL_TEXTURE_1D);
     auto noise_tex = eda221::loadTexture2D("noise.png");
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
+    float noise[32][32][32];
+    for (int y = 0; y < 32; y++)
+    for (int x = 0; x < 32; x++)
+    for (int z = 0; z < 32; z++) {
+        noise[z][y][x] = (rand() % 32768) / 32768.0;
+    }
+    GLuint noise_t = 0u;
+    glGenTextures(1, &noise_t);
+    assert(noise_t != 0u);
+    glBindTexture(GL_TEXTURE_3D, noise_t);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, 32, 32, 32, 0, GL_RED, GL_FLOAT, noise);
+    glBindTexture(GL_TEXTURE_3D, 0u);
+    cube_node.add_texture("noise_t", noise_t, GL_TEXTURE_3D);
+
     auto seconds_nb = 0.0f;
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    /*
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    */
 
     double ddeltatime;
     size_t fpsSamples = 0;
     double nowTime, lastTime = GetTimeMilliseconds();
     double fpsNextTick = lastTime + 1000.0;
+    GLuint mode = 0u;
 
     while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
         nowTime = GetTimeMilliseconds();
@@ -225,19 +250,25 @@ edan35::Terrainer::run()
         if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
             reload_shaders();
         }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_L) & JUST_PRESSED) {
+            mode = GL_LINE;
+        }
+        if (inputHandler->GetKeycodeState(GLFW_KEY_F) & JUST_PRESSED) {
+            mode = GL_FILL;
+        }
+        glPolygonMode(GL_FRONT_AND_BACK, mode);
 
         auto const window_size = window->GetDimensions();
         glViewport(0, 0, window_size.x, window_size.y);
         glClearDepthf(1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.53f, 0.81f, 0.98f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         GLStateInspection::View::Render();
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
         if (opened)
             ImGui::Text("%.3f ms", ddeltatime);
