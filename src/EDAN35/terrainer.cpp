@@ -52,10 +52,10 @@ edan35::Terrainer::Terrainer()
     Log::View::Init();
 
     window = Window::Create("Terrainer", config::resolution_x,
-                            config::resolution_y, config::msaa_rate, false, false);
+			    config::resolution_y, config::msaa_rate, false, false);
     if (window == nullptr) {
-        Log::View::Destroy();
-        throw std::runtime_error("Failed to get a window: aborting!");
+	Log::View::Destroy();
+	throw std::runtime_error("Failed to get a window: aborting!");
     }
     inputHandler = new InputHandler();
     window->SetInputHandler(inputHandler);
@@ -91,8 +91,8 @@ edan35::Terrainer::run()
     // Setup the camera
     //
     FPSCameraf mCamera(bonobo::pi / 4.0f,
-                       static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
-                       1.0f, 10000.0f);
+		       static_cast<float>(window_size.x) / static_cast<float>(window_size.y),
+		       1.0f, 10000.0f);
     mCamera.mWorld.SetTranslate(glm::vec3(0.0f, 2.0f, 6.0f));
     mCamera.mMouseSensitivity = 0.003f;
     mCamera.mMovementSpeed = 0.05f;
@@ -100,8 +100,8 @@ edan35::Terrainer::run()
 
     auto const cube = parametric_shapes::create_cube(64u);
     if (cube.vao == 0u) {
-        LogError("Failed to load marching cube");
-        return;
+	LogError("Failed to load marching cube");
+	return;
     }
     float const cube_step = static_cast<float>(2.0 / 64.0);
 
@@ -110,27 +110,27 @@ edan35::Terrainer::run()
     //
     auto fallback_shader = eda221::createProgram("fallback.vert", "fallback.frag");
     if (fallback_shader == 0u) {
-        LogError("Failed to load fallback shader");
-        return;
+	LogError("Failed to load fallback shader");
+	return;
     }
 
     auto const reload_shader = [fallback_shader](std::string const& vertex_path,
-                                                 std::string const& geo_path,
-                                                 std::string const& fragment_path,
-                                                 GLuint& program) {
-        if (program != 0u && program != fallback_shader)
-            glDeleteProgram(program);
-        program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, geo_path, fragment_path);
-        if (program == 0u) {
-            LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
-            program = fallback_shader;
-        }
+						 std::string const& geo_path,
+						 std::string const& fragment_path,
+						 GLuint& program) {
+	if (program != 0u && program != fallback_shader)
+	    glDeleteProgram(program);
+	program = eda221::createProgramWithGeo("TERRAINER/", vertex_path, geo_path, fragment_path);
+	if (program == 0u) {
+	    LogError("Failed to load \"%s\", \"%s\", and \"%s\"", vertex_path.c_str(), fragment_path.c_str(), geo_path.c_str());
+	    program = fallback_shader;
+	}
     };
 
     GLuint marching_shader = 0u;
     auto const reload_shaders = [&reload_shader, &marching_shader]() {
-        LogInfo("Reloading shaders");
-        reload_shader("marching.vert", "marching.geo", "marching.frag", marching_shader);
+	LogInfo("Reloading shaders");
+	reload_shader("marching.vert", "marching.geo", "marching.frag", marching_shader);
     };
     reload_shaders();
 
@@ -139,12 +139,12 @@ edan35::Terrainer::run()
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const set_uniforms = [&light_position, &light_ambient, &light_diffuse, &light_specular, &cube_step, &mCamera](GLuint program){
-        glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
-        glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
-        glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
-        glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
-        glUniform4fv(glGetUniformLocation(program, "camera_pos"), 1, glm::value_ptr(mCamera.mWorld.GetTranslation()));
-    	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
+	glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
+	glUniform4fv(glGetUniformLocation(program, "light_ambient"), 1, glm::value_ptr(light_ambient));
+	glUniform4fv(glGetUniformLocation(program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
+	glUniform4fv(glGetUniformLocation(program, "light_specular"), 1, glm::value_ptr(light_specular));
+	glUniform4fv(glGetUniformLocation(program, "camera_pos"), 1, glm::value_ptr(mCamera.mWorld.GetTranslation()));
+	glUniform1f(glGetUniformLocation(program, "cube_step"), cube_step);
     };
 
     int* edge_conn = create_edge_conn();
@@ -170,26 +170,7 @@ edan35::Terrainer::run()
     for (int y = 0; y < 32; y++)
     for (int x = 0; x < 32; x++)
     for (int z = 0; z < 32; z++) {
-        noise[x][y][z] = y - 7.f + 0.6f*cos(x*rand() / (10.0f + rand() % 3) + rand()) - 0.5f*sin(z / (30.f + rand() % 10) + rand() % 2) + 1 / (rand() % 4 + 1);
-
-                // Create mountain
-                if (fabs(18.0f + rand() % 5 - x)*fabs(18.0f + rand() % 6 - x) + fabs(15.0f + rand() % 5 - z)*fabs(15.0f + rand() % 4 - z) < 35 && y < 20 - rand() % 3)
-                {
-                    noise[x][y][z] = -1;
-                }
-
-                // Create bay
-                if (fabs(10.0f + rand() % 10 - x)*fabs(10.0f + rand() % 10 - x) + fabs(25.0f + rand() % 7 - z)*fabs(25.0f + rand() % 7 - z) < 35)
-                {
-                    noise[x][y][z] = 1;
-                }
-
-                // Round off terrain
-                if (fabs(15.0f - z)*fabs(15.0f - z) + fabs(15.0f - x)*fabs(15.0f - x) >  (13.0f + rand() % 2)*(15.0f + rand() % 2))
-                {
-                    noise[x][y][z] = 1;
-                }
-        //noise[z][y][x] = (rand() % 32768) / 32768.0;
+	noise[z][y][x] = (rand() % 32768) / 32768.0;
     }
     GLuint noise_t = 0u;
     glGenTextures(1, &noise_t);
@@ -221,51 +202,51 @@ edan35::Terrainer::run()
     GLuint mode = 0u;
 
     while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
-        nowTime = GetTimeMilliseconds();
-        ddeltatime = nowTime - lastTime;
-        if (nowTime > fpsNextTick) {
-            fpsNextTick += 1000.0;
-            fpsSamples = 0;
-        }
-        fpsSamples++;
-        seconds_nb += static_cast<float>(ddeltatime / 1000.0);
+	nowTime = GetTimeMilliseconds();
+	ddeltatime = nowTime - lastTime;
+	if (nowTime > fpsNextTick) {
+	    fpsNextTick += 1000.0;
+	    fpsSamples = 0;
+	}
+	fpsSamples++;
+	seconds_nb += static_cast<float>(ddeltatime / 1000.0);
 
-        glfwPollEvents();
-        inputHandler->Advance();
-        mCamera.Update(ddeltatime, *inputHandler);
+	glfwPollEvents();
+	inputHandler->Advance();
+	mCamera.Update(ddeltatime, *inputHandler);
 
-        ImGui_ImplGlfwGL3_NewFrame();
+	ImGui_ImplGlfwGL3_NewFrame();
 
-        if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
-            reload_shaders();
-        }
-        if (inputHandler->GetKeycodeState(GLFW_KEY_L) & JUST_PRESSED) {
-            mode = GL_LINE;
-        }
-        if (inputHandler->GetKeycodeState(GLFW_KEY_F) & JUST_PRESSED) {
-            mode = GL_FILL;
-        }
-        glPolygonMode(GL_FRONT_AND_BACK, mode);
+	if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
+	    reload_shaders();
+	}
+	if (inputHandler->GetKeycodeState(GLFW_KEY_L) & JUST_PRESSED) {
+	    mode = GL_LINE;
+	}
+	if (inputHandler->GetKeycodeState(GLFW_KEY_F) & JUST_PRESSED) {
+	    mode = GL_FILL;
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, mode);
 
-        auto const window_size = window->GetDimensions();
-        glViewport(0, 0, window_size.x, window_size.y);
-        glClearDepthf(1.0f);
-        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	auto const window_size = window->GetDimensions();
+	glViewport(0, 0, window_size.x, window_size.y);
+	glClearDepthf(1.0f);
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
+	cube_node.render(mCamera.GetWorldToClipMatrix(), cube_node.get_transform());
 
-        bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        if (opened)
-            ImGui::Text("%.3f ms", ddeltatime);
-        ImGui::End();
+	bool opened = ImGui::Begin("Render Time", nullptr, ImVec2(120, 50), -1.0f, 0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (opened)
+	    ImGui::Text("%.3f ms", ddeltatime);
+	ImGui::End();
 
-        Log::View::Render();
-        ImGui::Render();
+	Log::View::Render();
+	ImGui::Render();
 
-        window->Swap();
-        lastTime = nowTime;
+	window->Swap();
+	lastTime = nowTime;
     }
 
     glDeleteProgram(fallback_shader);
@@ -278,7 +259,7 @@ int*
 edan35::Terrainer::create_edge_conn()
 {
     static int edge_conn[256*20] = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      1, 8, 3, -1, 9, 8, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -543,10 +524,10 @@ int main()
 {
     Bonobo::Init();
     try {
-        edan35::Terrainer terrainer;
-        terrainer.run();
+	edan35::Terrainer terrainer;
+	terrainer.run();
     } catch (std::runtime_error const& e) {
-        LogError(e.what());
+	LogError(e.what());
     }
     Bonobo::Destroy();
 }
