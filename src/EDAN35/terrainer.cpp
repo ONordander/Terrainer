@@ -132,12 +132,12 @@ edan35::Terrainer::run()
     glBindTexture(noise_tex, 0u);
     */
 
-    auto const cube = parametric_shapes::create_cube(128u);
+    auto const cube = parametric_shapes::create_cube(64u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0 / 128.0);
+    float const cube_step = static_cast<float>(2.0 / 64.0);
     //
     // Load all the shader programs used
     //
