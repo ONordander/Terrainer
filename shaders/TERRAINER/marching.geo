@@ -68,7 +68,8 @@ float density(vec4 world_pos)
 {
 	//return (world_pos, 32.0f);
 	float density = -world_pos.y;
-	density += smooth_noise(world_pos);
+	density += pow(world_pos.x, 2) + pow(world_pos.y, 2) + pow(world_pos.z, 2) - 1; // a unit sphere
+	//density += smooth_noise(world_pos);
 	//return (texture(noise_t, ((world_pos.xyz + 1) / 2)).r * 2) - 1;
 	//return (texture(noise_tex, world_pos.xy).r * 2) - 1;
 	return density;

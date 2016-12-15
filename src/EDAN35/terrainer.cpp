@@ -132,12 +132,12 @@ edan35::Terrainer::run()
     glBindTexture(noise_tex, 0u);
     */
 
-    auto const cube = parametric_shapes::create_cube(64u);
+    auto const cube = parametric_shapes::create_cube(128u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0 / 64.0);
+    float const cube_step = static_cast<float>(2.0 / 128.0);
     //
     // Load all the shader programs used
     //
@@ -167,7 +167,7 @@ edan35::Terrainer::run()
     };
     reload_shaders();
 
-    auto const light_position = glm::vec3(1.0f, 1.0f, 4.0f);
+    auto const light_position = glm::vec3(5.0f, 5.0f, 4.0f);
     auto const light_ambient = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
