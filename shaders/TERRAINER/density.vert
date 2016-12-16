@@ -4,7 +4,6 @@ uniform mat4 vertex_model_to_world;
 uniform sampler3D noise_t;
 
 layout (location = 0) in vec3 vertex;
-layout (location = 0) out float density;
 
 float smooth_noise(vec4 world_pos)
 {
@@ -42,6 +41,4 @@ float smooth_noise(vec4 world_pos)
 void main()
 {
     vec4 world_pos = vertex_model_to_world * vec4(vertex, 1.0);
-    density = -world_pos.y;
-    density += smooth_noise(world_pos);
 }
