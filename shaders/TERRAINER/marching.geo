@@ -38,7 +38,6 @@ float smooth_noise(vec4 world_pos)
 	int y2 = int(mod(y1 + NOISE_Y - 1, NOISE_Y));
 	int z2 = int(mod(z1 + NOISE_Z - 1, NOISE_Z));
 
-
 	float value = 0.0;
 	value += fractX * fractY * fractZ * texelFetch(noise_t, ivec3(z1, y1, x1), 0).r;
 	value += fractX * (1 - fractY) * fractZ * texelFetch(noise_t, ivec3(z1, y2, x1), 0).r;
@@ -68,7 +67,12 @@ float density(vec4 world_pos)
 {
 	//return (world_pos, 32.0f);
 	float density = -world_pos.y;
-	density += smooth_noise(world_pos);
+	float warp = smooth_noise(world_pos * 0.004);
+	vec4 ws = world_pos + warp * 8;
+	density += smooth_noise(ws * 0.95);
+	density += smooth_noise(ws * 1.99) * 0.45;
+	density += smooth_noise(ws * 4.17) * 0.22;
+	density += smooth_noise(ws * 9.05) * 0.11;
 	//return (texture(noise_t, ((world_pos.xyz + 1) / 2)).r * 2) - 1;
 	//return (texture(noise_tex, world_pos.xy).r * 2) - 1;
 	return density;

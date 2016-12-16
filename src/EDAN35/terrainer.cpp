@@ -132,12 +132,12 @@ edan35::Terrainer::run()
     glBindTexture(noise_tex, 0u);
     */
 
-    auto const cube = parametric_shapes::create_cube(64u);
+    auto const cube = parametric_shapes::create_cube(32u);
     if (cube.vao == 0u) {
         LogError("Failed to load marching cube");
         return;
     }
-    float const cube_step = static_cast<float>(2.0 / 64.0);
+    float const cube_step = static_cast<float>(2.0 / 32.0);
     //
     // Load all the shader programs used
     //
@@ -167,7 +167,7 @@ edan35::Terrainer::run()
     };
     reload_shaders();
 
-    auto const light_position = glm::vec3(1.0f, 1.0f, 4.0f);
+    auto const light_position = glm::vec3(10.0f, 10.0f, 15.0f);
     auto const light_ambient = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
     auto const light_diffuse = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
     auto const light_specular = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -199,7 +199,7 @@ edan35::Terrainer::run()
     auto noise_tex = eda221::loadTexture2D("noise.png");
     cube_node.add_texture("noise_tex", noise_tex, GL_TEXTURE_2D);
 
-    auto marble = eda221::loadTexture2D("diffuse.png");
+    auto marble = eda221::loadTexture2D("TexturesCom_ConcreteFloors0060_1_XL.png");
     cube_node.add_texture("marble_tex", marble);
 
     float noise[32][32][32];
