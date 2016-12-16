@@ -65,14 +65,18 @@ float turbulence(vec4 world_pos, float initial_size)
 
 float density(vec4 world_pos)
 {
-	//return (world_pos, 32.0f);
 	float density = -world_pos.y;
+	/*
 	float warp = smooth_noise(world_pos * 0.004);
 	vec4 ws = world_pos + warp * 8;
 	density += smooth_noise(ws * 0.95);
 	density += smooth_noise(ws * 1.99) * 0.45;
 	density += smooth_noise(ws * 4.17) * 0.22;
 	density += smooth_noise(ws * 9.05) * 0.11;
+	*/
+	density += pow(world_pos.x, 2) / 3.0 + pow(world_pos.y, 2) / 3.0 - pow(world_pos.z, 2) / 3.0 - 1;
+	//density += pow(world_pos.x, 2) + pow(world_pos.y, 2) + pow(world_pos.z, 2) - 1; // a unit sphere
+	//density += smooth_noise(world_pos);
 	//return (texture(noise_t, ((world_pos.xyz + 1) / 2)).r * 2) - 1;
 	//return (texture(noise_tex, world_pos.xy).r * 2) - 1;
 	return density;
