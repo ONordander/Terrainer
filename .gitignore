@@ -22,3 +22,10 @@ log.txt
 tags
 *.swp
 *.swo
+
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
+*.bib.blg
