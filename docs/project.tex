@@ -1,0 +1,108 @@
+\documentclass{acmsiggraph}               % final
+
+%% These two line bring in essential packages: ``mathptmx'' for Type 1
+%% typefaces, and ``graphicx'' for inclusion of EPS figures.
+
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{times}
+\usepackage{amssymb}
+
+
+
+%% Paper title.
+
+\title{Using Marching Cubes to generate terrain on the GPU}
+
+%% Author / Affiliation (single author).
+
+%%\author{Roy G. Biv}
+%%\affiliation{Allied Widgets Research\thanks{email:roy.g.biv@aol.com}}
+
+%% Author / Affiliation (multiple authors).
+
+\author{Otto Nordander\thanks{e-mail: avo10ono@student.lu.se} \and Gustaf Oxenstierna\thanks{his13gox@student.lu.se}
+}
+\affiliation{Lund University\\ Sweden}
+
+
+%% Keywords that describe your work.
+\keywords{}
+
+%%%%%% START OF THE PAPER %%%%%%
+
+\begin{document}
+
+\ifpdf
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+\else
+  \DeclareGraphicsExtensions{.eps}
+\fi
+
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+
+\section{Introduction}
+In this project we implemented the Marching cubes algorithm and used it to procedurally
+generate random terrain using the paralell computing power of the GPU. We chose this project
+because we are interested in different approached to procedurally generate terrain and we selected
+this particular project because it is possible to generate this terrain in real time and at
+interactive frame rates. During implementation we discovered that our textures became warped
+so we also implemented tri-planar texturing to solve this issue.
+\section{Algorithms}
+We used two main algorithms for this project, Marching cubes and tri-planar texturing, with
+the former being used to generate terrain and the latter being used to counteract the stretching
+of textures applied to the terrain.
+\subsection{Marching cubes}
+For the Marching cubes algorithm to work, one needs a density function that describes the surface
+one is trying to generate. This density function takes any world space coordinate and maps it to
+a floating point number such that:
+$$ f(x,y,z) : \mathbb{R}^{3} \rightarrow \mathbb{R} $$
+To turn this in to something that is actually useful to us, we define the world space coordinates
+where the density function is zero to be the surface we are generating. Any points where the density 
+function is negative are located above the surface with a positive density function means the point
+is under the surface ~\cite{Geiss}.
+
+To generate a surface, we must first divide the terrain into an infinite number of equally sized
+blocks that are further subdivided into 32x32x32 voxels. We generate our triangles by visiting
+each voxel in a block and sampling the density function at all eight corners of the voxel. The
+eight resulting density values are masked together to produce an 8-bit integer, denoted the case number which is used
+for a table lookup to tell us how many triangles to generate for this voxel. A second table
+lookup is then done, using the number of triangles and the case number to determine where in the
+voxel the triangles should be located. All triangles have their endpoints connected to the corner
+edges of the voxel.
+
+
+\subsection{Tri-planar texturing}
+
+\subsection{Results}
+
+\section{Discussion}
+
+\section{Conclusion}
+%Some groups may not have enough important material to write a ``Discussion''-section,
+%and in such cases, that section can be omitted. Also, look at scientific papers,
+%e.g.,~\cite{Hakura97,Igehy98,RaganKelley2011,Doggett2012,Ganestam2015}, and try to follow their general style.
+%When in doubt, come and ask us.
+%If you need references not found in the file \texttt{project.bib}, simply add your reference to
+%that file. The report should be 2--4 pages long.
+
+%You can include screenshots as PNGs or illustrations in the PDF format.
+%An example is shown in Figure~\ref{fig_lugg}. See the source file \texttt{project.tex}
+%for how this is done in \LaTeX.
+%\begin{figure}[tb]
+%    \centering
+%    \includegraphics[width=0.7\columnwidth]{lugg.png}
+%    \caption{This is the logotype for LUGG: Lund University Graphics Group.}
+%    \label{fig_lugg}
+%\end{figure}
+
+\bibliographystyle{acmsiggraph}
+%\nocite{*}
+\bibliography{project}
+\end{document}
