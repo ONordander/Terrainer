@@ -49,7 +49,7 @@
 
 \section{Introduction}
 In this project we implemented the Marching cubes algorithm and used it to procedurally
-generate random terrain using the paralell computing power of the GPU. We chose this project
+generate random terrain using the parallel computing power of the GPU. We chose this project
 because we are interested in different approached to procedurally generate terrain and we selected
 this particular project because it is possible to generate this terrain in real time and at
 interactive frame rates. During implementation we discovered that our textures became warped
@@ -75,12 +75,26 @@ eight resulting density values are masked together to produce an 8-bit integer, 
 for a table lookup to tell us how many triangles to generate for this voxel. A second table
 lookup is then done, using the number of triangles and the case number to determine where in the
 voxel the triangles should be located. All triangles have their endpoints connected to the corner
-edges of the voxel.
+edges of the voxel ~\cite{Geiss}.
 
+To actually generate the triangles, we use the geometry shader which is the only shader that can
+create geometry. The density function we use is based on random noise which is sampled using
+bilinear interpolation to ensure a smoother noise texture ~\cite{lodev}. The baseline for our
+terrain is simply the negative y axis world space coordinate, we then add noise sampled using
+different frequencies and amplitude to the density to obtain our final value.
 
 \subsection{Tri-planar texturing}
+One issue we faced when generating terrain was correctly texturing this terrain as the height
+differences lead to unfavourable stretching of the textures. Tri-planar texturing is a method
+for solving these issues by rendering the texture three times in three different directions:
+once along the X-axis, once along the Y-axis and finally once along the Z-axis. The results
+are subsequently blended together based on how much the fragment is facing a certain axis. For
+instance, if a fragment is facing 25\% towards the X-axis and 75\% towards the Z-axis, 25\% of
+the X-axis rendering and 75\% of the Z-axis rendering will be used ~\cite{Owens2014}.
+Another advantage to using this method is that we do not have to derive texture coordinates for
+the terrain since the world space coordinates are used for the texture lookup.
 
-\subsection{Results}
+\section{Results}
 
 \section{Discussion}
 
